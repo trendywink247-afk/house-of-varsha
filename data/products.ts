@@ -1,7 +1,7 @@
-import { Product } from '@/lib/googleSheets'
+import { Product, ColorVariant } from '@/lib/googleSheets'
 
-// Re-export the Product type for convenience
-export type { Product }
+// Re-export types for convenience
+export type { Product, ColorVariant }
 
 // Default products - these will be used if Google Sheets is not configured
 // You can update these directly OR use Google Sheets for easy updates

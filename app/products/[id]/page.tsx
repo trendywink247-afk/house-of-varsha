@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { products } from '@/data/products'
 import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
+import ProductGallery from '@/components/ProductGallery'
 
 interface ProductPageProps {
   params: { id: string }
@@ -34,6 +35,9 @@ export default function ProductPage({ params }: ProductPageProps) {
   const whatsappMessage = `Hello! I'm interested in ordering "${product.name}" (${product.code || product.id}) - ${product.price} from House of Varsha.`
   const whatsappLink = getWhatsAppLink(defaultSettings.whatsappNumber, whatsappMessage)
 
+  // Check if product has color variants
+  const hasColorVariants = product.colorVariants && product.colorVariants.length > 0
+
   return (
     <>
       {/* Breadcrumb */}
@@ -53,46 +57,39 @@ export default function ProductPage({ params }: ProductPageProps) {
       <section className="section-padding bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Image */}
-            <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
-              {product.image ? (
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-              ) : (
-                <span className="text-9xl font-serif text-taupe/30">
-                  {product.name.charAt(0)}
-                </span>
-              )}
+            {/* Product Gallery with Color Switcher */}
+            <div>
+              <ProductGallery
+                productName={product.name}
+                image={product.image}
+                images={product.images}
+                colorVariants={product.colorVariants}
+                color={product.color}
+              />
               {product.code && (
-                <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-sm px-3 py-1 rounded">
-                  Code: {product.code}
-                </span>
+                <p className="text-sm text-gray-500 mt-4">
+                  Product Code: <span className="font-medium">{product.code}</span>
+                </p>
               )}
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-2">
-                <p className="text-sm text-taupe uppercase tracking-wider">{product.category}</p>
-                {product.color && (
-                  <>
-                    <span className="text-gray-300">|</span>
-                    <p className="text-sm text-gray-500">{product.color}</p>
-                  </>
-                )}
-              </div>
+              <p className="text-sm text-taupe uppercase tracking-wider mb-2">{product.category}</p>
               <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">{product.name}</h1>
               <p className="text-3xl font-semibold text-taupe mb-6">{product.price}</p>
 
               <div className="prose prose-gray mb-6">
                 <p className="text-gray-600 leading-relaxed">{product.description}</p>
               </div>
+
+              {/* Available Colors (if not using gallery color picker) */}
+              {!hasColorVariants && product.color && (
+                <div className="mb-6">
+                  <h3 className="font-medium text-gray-900 mb-3">Color</h3>
+                  <p className="text-gray-600">{product.color}</p>
+                </div>
+              )}
 
               {/* Available Sizes */}
               {product.sizes && product.sizes.length > 0 && (

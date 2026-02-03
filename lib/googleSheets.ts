@@ -1,6 +1,11 @@
 // Google Sheets Integration for House of Varsha
 // This allows you to update products, images, and settings from a Google Sheet
 
+export interface ColorVariant {
+  color: string
+  images: string[]
+}
+
 export interface Product {
   id: string
   name: string
@@ -12,6 +17,7 @@ export interface Product {
   code: string
   image?: string
   images?: string[]
+  colorVariants?: ColorVariant[]
   featured?: boolean
   details?: string[]
 }
@@ -40,10 +46,15 @@ export const defaultSettings: SiteSettings = {
  * HOW TO SET UP YOUR GOOGLE SHEET:
  *
  * 1. Create a new Google Sheet with these columns:
- *    id | name | price | description | category | sizes | color | code | image | images | featured
+ *    id | name | price | description | category | sizes | color | code | image | images | colorVariants | featured
  *
- *    Example row:
- *    K001 | Kalamkari Kurti - Yellow | ₹995 | Pure cotton fabric... | Kurti | M,L,XL,XXL | Yellow | K001 | https://drive.google.com/... | | true
+ *    Example row (single color):
+ *    K001 | Kalamkari Kurti | ₹995 | Pure cotton... | Kurti | M,L,XL,XXL | Yellow | K001 | main.jpg | | | true
+ *
+ *    Example row (multiple colors with multiple images each):
+ *    K001 | Kalamkari Kurti | ₹995 | Pure cotton... | Kurti | M,L,XL,XXL | | K001 | | | Yellow:img1.jpg,img2.jpg;Red:img1.jpg,img2.jpg;Blue:img1.jpg | true
+ *
+ *    colorVariants format: Color1:img1,img2,img3;Color2:img1,img2;Color3:img1
  *
  * 2. For images, you can:
  *    - Use Google Drive links (make sure to share as "Anyone with link")
@@ -125,6 +136,28 @@ export function convertGoogleDriveLink(url: string): string {
   return url
 }
 
+// Parse color variants string
+// Format: "Yellow:img1.jpg,img2.jpg;Red:img1.jpg,img2.jpg;Blue:img1.jpg"
+export function parseColorVariants(colorVariantsStr: string): ColorVariant[] {
+  if (!colorVariantsStr) return []
+
+  const variants: ColorVariant[] = []
+  const colorGroups = colorVariantsStr.split(';')
+
+  for (const group of colorGroups) {
+    const [color, imagesStr] = group.split(':')
+    if (color && imagesStr) {
+      const images = imagesStr.split(',').map(url => convertGoogleDriveLink(url.trim()))
+      variants.push({
+        color: color.trim(),
+        images
+      })
+    }
+  }
+
+  return variants
+}
+
 // Fetch products from Google Sheet
 export async function fetchProductsFromSheet(): Promise<Product[]> {
   const sheetUrl = process.env.GOOGLE_SHEETS_PRODUCTS_URL
@@ -148,20 +181,24 @@ export async function fetchProductsFromSheet(): Promise<Product[]> {
 
     return data
       .filter(row => row.id && row.name) // Filter out empty rows
-      .map(row => ({
-        id: row.id || row.code?.toLowerCase(),
-        name: row.name,
-        price: row.price,
-        description: row.description,
-        category: row.category,
-        sizes: row.sizes ? row.sizes.split(',').map(s => s.trim()) : [],
-        color: row.color,
-        code: row.code,
-        image: convertGoogleDriveLink(row.image),
-        images: row.images ? row.images.split(',').map(url => convertGoogleDriveLink(url.trim())) : [],
-        featured: row.featured?.toLowerCase() === 'true',
-        details: row.details ? row.details.split('|').map(d => d.trim()) : []
-      }))
+      .map(row => {
+        const colorVariants = parseColorVariants(row.colorvariants || row.colorVariants || '')
+        return {
+          id: row.id || row.code?.toLowerCase(),
+          name: row.name,
+          price: row.price,
+          description: row.description,
+          category: row.category,
+          sizes: row.sizes ? row.sizes.split(',').map(s => s.trim()) : [],
+          color: row.color || (colorVariants.length > 0 ? colorVariants[0].color : ''),
+          code: row.code,
+          image: convertGoogleDriveLink(row.image) || (colorVariants.length > 0 ? colorVariants[0].images[0] : ''),
+          images: row.images ? row.images.split(',').map(url => convertGoogleDriveLink(url.trim())) : [],
+          colorVariants: colorVariants.length > 0 ? colorVariants : undefined,
+          featured: row.featured?.toLowerCase() === 'true',
+          details: row.details ? row.details.split('|').map(d => d.trim()) : []
+        }
+      })
   } catch (error) {
     console.error('Error fetching products from Google Sheet:', error)
     return []
