@@ -1,127 +1,124 @@
-export interface Product {
-  id: string
-  name: string
-  price: string
-  description: string
-  category: string
-  featured?: boolean
-  details?: string[]
-}
+import { Product } from '@/lib/googleSheets'
 
+// Re-export the Product type for convenience
+export type { Product }
+
+// Default products - these will be used if Google Sheets is not configured
+// You can update these directly OR use Google Sheets for easy updates
 export const products: Product[] = [
   {
-    id: 'artisan-tote',
-    name: 'Artisan Leather Tote',
-    price: '₹4,500',
-    description: 'A beautifully crafted leather tote bag, perfect for daily elegance. Hand-stitched with care using premium full-grain leather that develops a beautiful patina over time.',
-    category: 'Bags',
+    id: 'k001',
+    name: 'Kalamkari Kurti - Yellow Family',
+    price: '₹995',
+    description: 'Pure cotton fabric with traditional Kalamkari print',
+    category: 'Kurti',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Yellow family',
+    code: 'K001',
     featured: true,
     details: [
-      'Full-grain genuine leather',
-      'Hand-stitched detailing',
-      'Interior zip pocket',
-      'Magnetic closure',
-      'Dimensions: 14" x 12" x 5"'
+      'Pure cotton fabric',
+      'Traditional Kalamkari print',
+      'Comfortable fit',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'silk-scarf',
-    name: 'Heritage Silk Scarf',
-    price: '₹2,200',
-    description: 'Luxurious pure silk scarf featuring traditional motifs reimagined for the modern aesthetic. Each piece is hand-printed by skilled artisans.',
-    category: 'Accessories',
+    id: 'k002',
+    name: 'Kalamkari Kurti - Rust Orange',
+    price: '₹995',
+    description: 'Pure cotton fabric with traditional Kalamkari print',
+    category: 'Kurti',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Rust orange',
+    code: 'K002',
     featured: true,
     details: [
-      '100% pure mulberry silk',
-      'Hand-printed design',
-      'Hand-rolled edges',
-      'Size: 90cm x 90cm',
-      'Comes in signature gift box'
+      'Pure cotton fabric',
+      'Traditional Kalamkari print',
+      'Comfortable fit',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'ceramic-vase',
-    name: 'Minimalist Ceramic Vase',
-    price: '₹1,800',
-    description: 'A stunning handcrafted ceramic vase with a modern minimalist design. Each piece is unique, with subtle variations that speak to its handmade nature.',
-    category: 'Home Decor',
+    id: 'v001',
+    name: '3-Piece Kurti Set - Lemon Yellow',
+    price: '₹699',
+    description: 'Complete 3-piece cotton kurti set',
+    category: 'Kurti Set',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Lemon yellow',
+    code: 'V001',
     featured: true,
     details: [
-      'Handcrafted stoneware ceramic',
-      'Food-safe glaze',
-      'Waterproof interior',
-      'Height: 25cm',
-      'Each piece is unique'
+      'Complete 3-piece set',
+      'Pure cotton fabric',
+      'Comfortable for all-day wear',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'brass-candle-holder',
-    name: 'Brass Candle Holder Set',
-    price: '₹3,200',
-    description: 'Set of three elegant brass candle holders with varying heights. Perfect for creating ambient lighting and adding warmth to any space.',
-    category: 'Home Decor',
+    id: 'v002',
+    name: '3-Piece Kurti Set - Lemon Yellow (Variant)',
+    price: '₹699',
+    description: 'Complete 3-piece cotton kurti set',
+    category: 'Kurti Set',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Lemon yellow',
+    code: 'V002',
     details: [
-      'Solid brass construction',
-      'Hand-polished finish',
-      'Set of 3 pieces',
-      'Heights: 15cm, 20cm, 25cm',
-      'Fits standard taper candles'
+      'Complete 3-piece set',
+      'Pure cotton fabric',
+      'Comfortable for all-day wear',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'cotton-throw',
-    name: 'Handwoven Cotton Throw',
-    price: '₹2,800',
-    description: 'Soft, breathable cotton throw handwoven by traditional weavers. Perfect for cozy evenings or as an elegant home accent.',
-    category: 'Home Decor',
+    id: 'v003',
+    name: '3-Piece Kurti Set - Sea Blue & Gold',
+    price: '₹699',
+    description: 'Complete 3-piece cotton kurti set in elegant color combination',
+    category: 'Kurti Set',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Sea blue and gold',
+    code: 'V003',
     details: [
-      '100% organic cotton',
-      'Handwoven on traditional loom',
-      'Natural dyes',
-      'Size: 150cm x 200cm',
-      'Machine washable'
+      'Complete 3-piece set',
+      'Elegant color combination',
+      'Pure cotton fabric',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'leather-journal',
-    name: 'Leather Bound Journal',
-    price: '₹1,500',
-    description: 'A timeless leather-bound journal with handmade cotton paper. Perfect for capturing thoughts, sketches, and precious memories.',
-    category: 'Stationery',
+    id: 'v004',
+    name: '3-Piece Kurti Set - Green',
+    price: '₹699',
+    description: 'Complete 3-piece cotton kurti set',
+    category: 'Kurti Set',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Green',
+    code: 'V004',
     details: [
-      'Full-grain leather cover',
-      'Handmade cotton paper',
-      '200 unlined pages',
-      'Ribbon bookmark',
-      'Size: A5'
+      'Complete 3-piece set',
+      'Pure cotton fabric',
+      'Comfortable for all-day wear',
+      'Available in M, L, XL, XXL'
     ]
   },
   {
-    id: 'wooden-box',
-    name: 'Carved Wooden Keepsake Box',
-    price: '₹2,000',
-    description: 'Exquisitely carved wooden box, perfect for storing jewelry and treasured keepsakes. Features intricate traditional patterns.',
-    category: 'Accessories',
+    id: 'v005',
+    name: '3-Piece Kurti Set - Grey',
+    price: '₹699',
+    description: 'Complete 3-piece cotton kurti set',
+    category: 'Kurti Set',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Grey',
+    code: 'V005',
     details: [
-      'Solid sheesham wood',
-      'Hand-carved details',
-      'Velvet-lined interior',
-      'Size: 15cm x 10cm x 8cm',
-      'Brass hinges and clasp'
-    ]
-  },
-  {
-    id: 'linen-pouch',
-    name: 'Embroidered Linen Pouch',
-    price: '₹900',
-    description: 'Delicate hand-embroidered linen pouch, perfect for cosmetics or small essentials. Features traditional embroidery techniques.',
-    category: 'Bags',
-    details: [
-      '100% linen exterior',
-      'Cotton lining',
-      'Hand-embroidered design',
-      'Zip closure',
-      'Size: 20cm x 15cm'
+      'Complete 3-piece set',
+      'Pure cotton fabric',
+      'Comfortable for all-day wear',
+      'Available in M, L, XL, XXL'
     ]
   }
 ]

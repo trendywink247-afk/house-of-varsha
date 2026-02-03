@@ -1,7 +1,11 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/googleSheets'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const whatsappLink = getWhatsAppLink(defaultSettings.whatsappNumber)
+  const instagramLink = getInstagramLink(defaultSettings.instagramHandle)
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -9,10 +13,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <h3 className="text-2xl font-serif mb-4">House of Varsha</h3>
+            <h3 className="text-2xl font-serif mb-4">{defaultSettings.logoText}</h3>
             <p className="text-gray-400 leading-relaxed mb-4">
-              Celebrating elegance and storytelling through premium handcrafted products.
-              Each piece tells a story of heritage, craftsmanship, and care.
+              {defaultSettings.tagline}
             </p>
           </div>
 
@@ -44,7 +47,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="https://wa.me/1234567890"
+                  href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
@@ -57,7 +60,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/houseofvarsha"
+                  href={instagramLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
@@ -74,7 +77,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
-          <p>&copy; {currentYear} House of Varsha. All rights reserved.</p>
+          <p>&copy; {currentYear} {defaultSettings.logoText}. All rights reserved.</p>
         </div>
       </div>
     </footer>
