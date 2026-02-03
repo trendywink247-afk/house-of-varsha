@@ -32,7 +32,7 @@ export default function Shop() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <Link href={`/products/${product.id}`} key={product.id} className="card group">
-                <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
+                <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
                   {product.image ? (
                     <Image
                       src={product.image}
@@ -42,12 +42,12 @@ export default function Shop() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (
-                    <span className="text-6xl font-serif text-taupe/40 group-hover:scale-110 transition-transform duration-500">
+                    <span className="text-6xl font-serif text-gold/40 group-hover:scale-110 transition-transform duration-500">
                       {product.name.charAt(0)}
                     </span>
                   )}
                   {product.featured && (
-                    <span className="absolute top-4 left-4 bg-taupe text-white text-xs px-3 py-1 rounded-full z-10">
+                    <span className="absolute top-4 left-4 bg-teal text-white text-xs px-3 py-1 rounded-full z-10">
                       Featured
                     </span>
                   )}
@@ -59,7 +59,7 @@ export default function Shop() {
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
-                    <p className="text-xs text-taupe uppercase tracking-wider">{product.category}</p>
+                    <p className="text-xs text-gold uppercase tracking-wider">{product.category}</p>
                     {product.color && (
                       <p className="text-xs text-gray-500">{product.color}</p>
                     )}
@@ -76,8 +76,8 @@ export default function Shop() {
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <p className="text-taupe font-semibold text-lg">{product.price}</p>
-                    <span className="text-sm text-gray-400 group-hover:text-taupe transition-colors">
+                    <p className="text-gold font-semibold text-lg">{product.price}</p>
+                    <span className="text-sm text-gray-400 group-hover:text-gold transition-colors">
                       View Details &rarr;
                     </span>
                   </div>

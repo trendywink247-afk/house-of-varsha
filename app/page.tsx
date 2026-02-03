@@ -44,13 +44,13 @@ export default function Home() {
                 We believe in quality fabrics, traditional prints, and comfortable fits
                 that make you feel confident and beautiful.
               </p>
-              <Link href="/about" className="text-taupe font-medium hover:underline">
+              <Link href="/about" className="text-gold font-medium hover:underline">
                 Learn more about us &rarr;
               </Link>
             </div>
-            <div className="bg-gradient-to-br from-dustyrose/20 to-sage/20 rounded-2xl p-8 aspect-square flex items-center justify-center">
+            <div className="bg-gradient-to-br from-coral/20 to-teal/20 rounded-2xl p-8 aspect-square flex items-center justify-center">
               <div className="text-center">
-                <span className="text-6xl font-serif text-taupe">HoV</span>
+                <span className="text-6xl font-serif text-gold">HoV</span>
                 <p className="mt-4 text-gray-500 text-sm">Est. 2024</p>
               </div>
             </div>
@@ -71,7 +71,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <Link href={`/products/${product.id}`} key={product.id} className="card group">
-                <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
+                <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
                   {product.image ? (
                     <Image
                       src={product.image}
@@ -81,7 +81,7 @@ export default function Home() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   ) : (
-                    <span className="text-4xl font-serif text-taupe/50 group-hover:scale-110 transition-transform">
+                    <span className="text-4xl font-serif text-gold/50 group-hover:scale-110 transition-transform">
                       {product.name.charAt(0)}
                     </span>
                   )}
@@ -103,7 +103,7 @@ export default function Home() {
                       ))}
                     </div>
                   )}
-                  <p className="text-taupe font-medium">{product.price}</p>
+                  <p className="text-gold font-medium">{product.price}</p>
                 </div>
               </Link>
             ))}
@@ -118,7 +118,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-taupe text-white">
+      <section className="section-padding bg-teal text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-serif mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl opacity-90 mb-8">
