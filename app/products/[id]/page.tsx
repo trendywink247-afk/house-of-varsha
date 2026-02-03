@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { products } from '@/data/products'
+import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
 
 interface ProductPageProps {
   params: { id: string }
@@ -29,9 +31,8 @@ export default function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
-  const whatsappMessage = encodeURIComponent(
-    `Hello! I'm interested in ordering "${product.name}" (${product.price}) from House of Varsha.`
-  )
+  const whatsappMessage = `Hello! I'm interested in ordering "${product.name}" (${product.code || product.id}) - ${product.price} from House of Varsha.`
+  const whatsappLink = getWhatsAppLink(defaultSettings.whatsappNumber, whatsappMessage)
 
   return (
     <>
@@ -53,24 +54,65 @@ export default function ProductPage({ params }: ProductPageProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Image */}
-            <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 rounded-2xl flex items-center justify-center">
-              <span className="text-9xl font-serif text-taupe/30">
-                {product.name.charAt(0)}
-              </span>
+            <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
+              {product.image ? (
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              ) : (
+                <span className="text-9xl font-serif text-taupe/30">
+                  {product.name.charAt(0)}
+                </span>
+              )}
+              {product.code && (
+                <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-sm px-3 py-1 rounded">
+                  Code: {product.code}
+                </span>
+              )}
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col justify-center">
-              <p className="text-sm text-taupe uppercase tracking-wider mb-2">{product.category}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <p className="text-sm text-taupe uppercase tracking-wider">{product.category}</p>
+                {product.color && (
+                  <>
+                    <span className="text-gray-300">|</span>
+                    <p className="text-sm text-gray-500">{product.color}</p>
+                  </>
+                )}
+              </div>
               <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">{product.name}</h1>
               <p className="text-3xl font-semibold text-taupe mb-6">{product.price}</p>
 
-              <div className="prose prose-gray mb-8">
+              <div className="prose prose-gray mb-6">
                 <p className="text-gray-600 leading-relaxed">{product.description}</p>
               </div>
 
+              {/* Available Sizes */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-medium text-gray-900 mb-3">Available Sizes</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((size) => (
+                      <span
+                        key={size}
+                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:border-taupe hover:text-taupe transition-colors"
+                      >
+                        {size}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Product Details */}
-              {product.details && (
+              {product.details && product.details.length > 0 && (
                 <div className="mb-8">
                   <h3 className="font-serif text-xl text-gray-900 mb-4">Product Details</h3>
                   <ul className="space-y-2">
@@ -86,7 +128,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
               {/* WhatsApp Order Button */}
               <a
-                href={`https://wa.me/1234567890?text=${whatsappMessage}`}
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-whatsapp justify-center text-lg"
@@ -115,14 +157,29 @@ export default function ProductPage({ params }: ProductPageProps) {
               .slice(0, 3)
               .map((relatedProduct) => (
                 <Link href={`/products/${relatedProduct.id}`} key={relatedProduct.id} className="card group">
-                  <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center">
-                    <span className="text-4xl font-serif text-taupe/40 group-hover:scale-110 transition-transform">
-                      {relatedProduct.name.charAt(0)}
-                    </span>
+                  <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
+                    {relatedProduct.image ? (
+                      <Image
+                        src={relatedProduct.image}
+                        alt={relatedProduct.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <span className="text-4xl font-serif text-taupe/40 group-hover:scale-110 transition-transform">
+                        {relatedProduct.name.charAt(0)}
+                      </span>
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-serif text-gray-900 mb-2">{relatedProduct.name}</h3>
-                    <p className="text-taupe font-medium">{relatedProduct.price}</p>
+                    <div className="flex justify-between items-center">
+                      <p className="text-taupe font-medium">{relatedProduct.price}</p>
+                      {relatedProduct.color && (
+                        <p className="text-xs text-gray-500">{relatedProduct.color}</p>
+                      )}
+                    </div>
                   </div>
                 </Link>
               ))}

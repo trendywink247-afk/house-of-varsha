@@ -1,12 +1,19 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { products } from '@/data/products'
+import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
 
 export const metadata = {
   title: 'Shop - House of Varsha',
-  description: 'Explore our curated collection of premium handcrafted products.',
+  description: 'Explore our curated collection of premium handcrafted kurtis and kurti sets.',
 }
 
 export default function Shop() {
+  const whatsappLink = getWhatsAppLink(
+    defaultSettings.whatsappNumber,
+    "Hello! I'm interested in a custom order from House of Varsha."
+  )
+
   return (
     <>
       {/* Hero Section */}
@@ -26,19 +33,48 @@ export default function Shop() {
             {products.map((product) => (
               <Link href={`/products/${product.id}`} key={product.id} className="card group">
                 <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
-                  <span className="text-6xl font-serif text-taupe/40 group-hover:scale-110 transition-transform duration-500">
-                    {product.name.charAt(0)}
-                  </span>
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <span className="text-6xl font-serif text-taupe/40 group-hover:scale-110 transition-transform duration-500">
+                      {product.name.charAt(0)}
+                    </span>
+                  )}
                   {product.featured && (
-                    <span className="absolute top-4 left-4 bg-taupe text-white text-xs px-3 py-1 rounded-full">
+                    <span className="absolute top-4 left-4 bg-taupe text-white text-xs px-3 py-1 rounded-full z-10">
                       Featured
+                    </span>
+                  )}
+                  {product.code && (
+                    <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
+                      {product.code}
                     </span>
                   )}
                 </div>
                 <div className="p-6">
-                  <p className="text-xs text-taupe uppercase tracking-wider mb-2">{product.category}</p>
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-xs text-taupe uppercase tracking-wider">{product.category}</p>
+                    {product.color && (
+                      <p className="text-xs text-gray-500">{product.color}</p>
+                    )}
+                  </div>
                   <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
-                  <p className="text-gray-500 text-sm mb-4 line-clamp-2">{product.description}</p>
+                  <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+                  {product.sizes && product.sizes.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {product.sizes.map((size) => (
+                        <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <p className="text-taupe font-semibold text-lg">{product.price}</p>
                     <span className="text-sm text-gray-400 group-hover:text-taupe transition-colors">
@@ -60,7 +96,7 @@ export default function Shop() {
             We offer custom orders and personalized products. Reach out to us directly!
           </p>
           <a
-            href="https://wa.me/1234567890?text=Hello! I'm interested in a custom order from House of Varsha."
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-whatsapp inline-flex"

@@ -1,8 +1,14 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { products } from '@/data/products'
+import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
 
 export default function Home() {
-  const featuredProducts = products.slice(0, 3)
+  const featuredProducts = products.filter(p => p.featured).slice(0, 3)
+  const whatsappLink = getWhatsAppLink(
+    defaultSettings.whatsappNumber,
+    "Hello! I'm interested in House of Varsha products."
+  )
 
   return (
     <>
@@ -11,10 +17,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-serif text-gray-900 mb-6 leading-tight">
-              House of Varsha
+              {defaultSettings.logoText}
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              Celebrating elegance and storytelling through premium handcrafted products
+              {defaultSettings.tagline}
             </p>
             <Link href="/shop" className="btn-primary inline-block">
               Explore Collection
@@ -30,14 +36,13 @@ export default function Home() {
             <div>
               <h2 className="text-4xl font-serif text-gray-900 mb-6">Our Story</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                The House of Varsha is born from a passion for refined craftsmanship
-                and timeless beauty. Each product carries a story, an essence of
-                heritage and care that transcends ordinary retail.
+                House of Varsha brings you authentic Indian ethnic wear crafted with love
+                and tradition. Our collection features beautiful Kalamkari kurtis and
+                elegant kurti sets perfect for every occasion.
               </p>
               <p className="text-gray-600 leading-relaxed mb-6">
-                We believe in the power of artisanal creation, where every stitch,
-                every fold, and every detail is a testament to dedication and love
-                for the craft.
+                We believe in quality fabrics, traditional prints, and comfortable fits
+                that make you feel confident and beautiful.
               </p>
               <Link href="/about" className="text-taupe font-medium hover:underline">
                 Learn more about us &rarr;
@@ -66,14 +71,38 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <Link href={`/products/${product.id}`} key={product.id} className="card group">
-                <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center">
-                  <span className="text-4xl font-serif text-taupe/50 group-hover:scale-110 transition-transform">
-                    {product.name.charAt(0)}
-                  </span>
+                <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  ) : (
+                    <span className="text-4xl font-serif text-taupe/50 group-hover:scale-110 transition-transform">
+                      {product.name.charAt(0)}
+                    </span>
+                  )}
+                  {product.code && (
+                    <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
+                      {product.code}
+                    </span>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
                   <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+                  {product.sizes && product.sizes.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {product.sizes.map((size) => (
+                        <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                          {size}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-taupe font-medium">{product.price}</p>
                 </div>
               </Link>
@@ -96,7 +125,7 @@ export default function Home() {
             Connect with us on WhatsApp for personalized recommendations
           </p>
           <a
-            href="https://wa.me/1234567890?text=Hello! I'm interested in House of Varsha products."
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-whatsapp inline-flex"

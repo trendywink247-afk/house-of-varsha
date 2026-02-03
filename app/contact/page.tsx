@@ -1,9 +1,17 @@
+import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/googleSheets'
+
 export const metadata = {
   title: 'Contact Us - House of Varsha',
   description: 'Get in touch with House of Varsha. We\'d love to hear from you!',
 }
 
 export default function Contact() {
+  const whatsappLink = getWhatsAppLink(
+    defaultSettings.whatsappNumber,
+    "Hello! I'm reaching out from the House of Varsha website."
+  )
+  const instagramLink = getInstagramLink(defaultSettings.instagramHandle)
+
   return (
     <>
       {/* Hero Section */}
@@ -22,7 +30,7 @@ export default function Contact() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* WhatsApp */}
             <a
-              href="https://wa.me/1234567890?text=Hello! I'm reaching out from the House of Varsha website."
+              href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               className="card p-8 text-center hover:border-green-500 border-2 border-transparent transition-colors"
@@ -34,12 +42,12 @@ export default function Contact() {
               </div>
               <h3 className="text-2xl font-serif text-gray-900 mb-2">WhatsApp</h3>
               <p className="text-gray-600 mb-4">Quick responses, personal service</p>
-              <span className="text-green-500 font-medium">Chat with us &rarr;</span>
+              <span className="text-green-500 font-medium">+91-7569619390 &rarr;</span>
             </a>
 
             {/* Instagram */}
             <a
-              href="https://instagram.com/houseofvarsha"
+              href={instagramLink}
               target="_blank"
               rel="noopener noreferrer"
               className="card p-8 text-center hover:border-pink-500 border-2 border-transparent transition-colors"
@@ -51,12 +59,12 @@ export default function Contact() {
               </div>
               <h3 className="text-2xl font-serif text-gray-900 mb-2">Instagram</h3>
               <p className="text-gray-600 mb-4">Follow our journey and latest updates</p>
-              <span className="text-pink-500 font-medium">@houseofvarsha &rarr;</span>
+              <span className="text-pink-500 font-medium">@{defaultSettings.instagramHandle} &rarr;</span>
             </a>
 
             {/* Email */}
             <a
-              href="mailto:hello@houseofvarsha.com"
+              href={`mailto:${defaultSettings.email}`}
               className="card p-8 text-center hover:border-taupe border-2 border-transparent transition-colors"
             >
               <div className="w-16 h-16 bg-taupe rounded-full flex items-center justify-center mx-auto mb-6">
@@ -66,7 +74,7 @@ export default function Contact() {
               </div>
               <h3 className="text-2xl font-serif text-gray-900 mb-2">Email</h3>
               <p className="text-gray-600 mb-4">For detailed inquiries</p>
-              <span className="text-taupe font-medium">hello@houseofvarsha.com</span>
+              <span className="text-taupe font-medium">{defaultSettings.email}</span>
             </a>
 
             {/* Location */}
@@ -93,6 +101,10 @@ export default function Contact() {
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h3 className="font-serif text-xl text-gray-900 mb-2">How do I place an order?</h3>
               <p className="text-gray-600">Simply browse our collection, click on the product you like, and use the WhatsApp button to connect with us directly. We'll guide you through the process!</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h3 className="font-serif text-xl text-gray-900 mb-2">What sizes are available?</h3>
+              <p className="text-gray-600">Most of our kurtis and kurti sets are available in M, L, XL, and XXL sizes. Contact us for specific measurements or custom sizing.</p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h3 className="font-serif text-xl text-gray-900 mb-2">Do you ship internationally?</h3>
