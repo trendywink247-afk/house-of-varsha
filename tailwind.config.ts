@@ -9,11 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cream: '#FFFDF7',
-        ivory: '#FFFFF0',
-        sage: '#9CAF88',
-        dustyrose: '#D4A5A5',
-        taupe: '#8B7355',
+        cream: '#F5F0E8',     // Warm beige background
+        ivory: '#FAF8F5',     // Lighter cream for gradients
+        teal: '#3A7D7B',      // Main accent (from logo circle)
+        gold: '#C9A227',      // Brand accent (from logo text)
+        coral: '#E8A091',     // Soft accent (from logo dress/flowers)
+        // Legacy aliases for gradual migration
+        sage: '#3A7D7B',
+        dustyrose: '#E8A091',
+        taupe: '#C9A227',
       },
       fontFamily: {
         serif: ['Playfair Display', 'Georgia', 'serif'],

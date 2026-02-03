@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 
 export default function Header() {
@@ -14,12 +15,22 @@ export default function Header() {
   ]
 
   return (
-    <header className="bg-cream border-b border-gray-100 sticky top-0 z-50">
+    <header className="bg-cream border-b border-teal/10 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-serif font-bold text-gray-900 hover:text-taupe transition-colors">
-            House of Varsha
+          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <Image
+              src="/logo.png"
+              alt="House of Varsha"
+              width={48}
+              height={48}
+              className="w-10 h-10 md:w-12 md:h-12"
+            />
+            <div className="hidden sm:block">
+              <span className="text-xl md:text-2xl font-serif font-bold text-gold">House of Varsha</span>
+              <span className="block text-xs text-teal tracking-wider">A DREAM BUSINESS</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -29,7 +40,7 @@ export default function Header() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-sans text-gray-600 hover:text-taupe transition-colors"
+                    className="font-sans text-gray-600 hover:text-teal transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -58,13 +69,13 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-100">
+          <nav className="md:hidden py-4 border-t border-teal/10">
             <ul className="space-y-4">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="block font-sans text-gray-600 hover:text-taupe transition-colors"
+                    className="block font-sans text-gray-600 hover:text-teal transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.label}
