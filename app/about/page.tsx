@@ -67,7 +67,7 @@ export default function About() {
       </section>
 
       {/* Values Section */}
-      <section className="section-padding bg-taupe text-white">
+      <section className="section-padding bg-teal text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-serif mb-8">Our Promise</h2>
           <p className="text-xl opacity-90 leading-relaxed">

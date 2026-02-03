@@ -40,9 +40,9 @@ export default function ProductPage({ params }: ProductPageProps) {
       <div className="bg-cream py-4">
         <div className="max-w-6xl mx-auto px-4">
           <nav className="text-sm text-gray-500">
-            <Link href="/" className="hover:text-taupe">Home</Link>
+            <Link href="/" className="hover:text-gold">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/shop" className="hover:text-taupe">Shop</Link>
+            <Link href="/shop" className="hover:text-gold">Shop</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
           </nav>
@@ -54,7 +54,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Image */}
-            <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
+            <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 rounded-2xl flex items-center justify-center relative overflow-hidden">
               {product.image ? (
                 <Image
                   src={product.image}
@@ -65,7 +65,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   priority
                 />
               ) : (
-                <span className="text-9xl font-serif text-taupe/30">
+                <span className="text-9xl font-serif text-gold/30">
                   {product.name.charAt(0)}
                 </span>
               )}
@@ -79,7 +79,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             {/* Product Info */}
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-3 mb-2">
-                <p className="text-sm text-taupe uppercase tracking-wider">{product.category}</p>
+                <p className="text-sm text-gold uppercase tracking-wider">{product.category}</p>
                 {product.color && (
                   <>
                     <span className="text-gray-300">|</span>
@@ -88,7 +88,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 )}
               </div>
               <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">{product.name}</h1>
-              <p className="text-3xl font-semibold text-taupe mb-6">{product.price}</p>
+              <p className="text-3xl font-semibold text-gold mb-6">{product.price}</p>
 
               <div className="prose prose-gray mb-6">
                 <p className="text-gray-600 leading-relaxed">{product.description}</p>
@@ -102,7 +102,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                     {product.sizes.map((size) => (
                       <span
                         key={size}
-                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:border-taupe hover:text-taupe transition-colors"
+                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:border-teal hover:text-gold transition-colors"
                       >
                         {size}
                       </span>
@@ -118,7 +118,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   <ul className="space-y-2">
                     {product.details.map((detail, index) => (
                       <li key={index} className="flex items-start text-gray-600">
-                        <span className="text-taupe mr-2">•</span>
+                        <span className="text-gold mr-2">•</span>
                         {detail}
                       </li>
                     ))}
@@ -157,7 +157,7 @@ export default function ProductPage({ params }: ProductPageProps) {
               .slice(0, 3)
               .map((relatedProduct) => (
                 <Link href={`/products/${relatedProduct.id}`} key={relatedProduct.id} className="card group">
-                  <div className="aspect-square bg-gradient-to-br from-sage/20 to-dustyrose/20 flex items-center justify-center relative overflow-hidden">
+                  <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
                     {relatedProduct.image ? (
                       <Image
                         src={relatedProduct.image}
@@ -167,7 +167,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
-                      <span className="text-4xl font-serif text-taupe/40 group-hover:scale-110 transition-transform">
+                      <span className="text-4xl font-serif text-gold/40 group-hover:scale-110 transition-transform">
                         {relatedProduct.name.charAt(0)}
                       </span>
                     )}
@@ -175,7 +175,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   <div className="p-6">
                     <h3 className="text-xl font-serif text-gray-900 mb-2">{relatedProduct.name}</h3>
                     <div className="flex justify-between items-center">
-                      <p className="text-taupe font-medium">{relatedProduct.price}</p>
+                      <p className="text-gold font-medium">{relatedProduct.price}</p>
                       {relatedProduct.color && (
                         <p className="text-xs text-gray-500">{relatedProduct.color}</p>
                       )}
