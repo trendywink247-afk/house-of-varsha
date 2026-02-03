@@ -22,7 +22,7 @@ export default function Footer() {
                 className="w-12 h-12 rounded-full bg-white/10"
               />
               <div>
-                <h3 className="text-2xl font-serif text-gold">{defaultSettings.logoText}</h3>
+                <h3 className="text-2xl font-serif text-gold">{defaultSettings.storeName}</h3>
                 <span className="text-xs text-cream/80 tracking-wider">A DREAM BUSINESS</span>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-cream/60 text-sm">
-          <p>&copy; {currentYear} {defaultSettings.logoText}. All rights reserved.</p>
+          <p>&copy; {currentYear} {defaultSettings.storeName}. All rights reserved.</p>
           <p className="mt-2 text-cream/40 text-xs">built by geekspace</p>
         </div>
       </div>

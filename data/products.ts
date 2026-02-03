@@ -5,6 +5,18 @@ export type { Product, ColorVariant }
 
 // Default products - these will be used if Google Sheets is not configured
 // You can update these directly OR use Google Sheets for easy updates
+//
+// To use Cloudinary images, add:
+//   cloudinaryId: 'products/your-image-id'
+//
+// Example with Cloudinary:
+//   {
+//     id: 'k001',
+//     name: 'Kalamkari Kurti',
+//     cloudinaryId: 'house-of-varsha/products/kurti-k001',
+//     ...
+//   }
+
 export const products: Product[] = [
   {
     id: 'k001',
@@ -16,6 +28,7 @@ export const products: Product[] = [
     color: 'Yellow family',
     code: 'K001',
     featured: true,
+    inStock: true,
     details: [
       'Pure cotton fabric',
       'Traditional Kalamkari print',
