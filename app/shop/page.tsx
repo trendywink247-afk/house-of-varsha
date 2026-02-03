@@ -1,16 +1,26 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { products } from '@/data/products'
-import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
+import { getProducts, getSettings, getCategories, Product } from '@/lib/data'
+import { getWhatsAppLink } from '@/lib/googleSheets'
 
 export const metadata = {
   title: 'Shop - House of Varsha',
   description: 'Explore our curated collection of premium handcrafted kurtis and kurti sets.',
 }
 
-export default function Shop() {
+// Revalidate every 60 seconds to pick up Google Sheets changes
+export const revalidate = 60
+
+export default async function Shop() {
+  // Fetch data from Google Sheets (or fallback)
+  const [products, settings, categories] = await Promise.all([
+    getProducts(),
+    getSettings(),
+    getCategories()
+  ])
+
   const whatsappLink = getWhatsAppLink(
-    defaultSettings.whatsappNumber,
+    settings.whatsappNumber,
     "Hello! I'm interested in a custom order from House of Varsha."
   )
 
@@ -23,68 +33,36 @@ export default function Shop() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Each piece in our collection tells a unique story of craftsmanship and care
           </p>
+          {categories.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              {categories.map((category) => (
+                <span
+                  key={category}
+                  className="px-4 py-2 bg-white/80 rounded-full text-sm text-gray-600"
+                >
+                  {category}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Products Grid */}
       <section className="section-padding bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="card group">
-                <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
-                  {product.image ? (
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <span className="text-6xl font-serif text-gold/40 group-hover:scale-110 transition-transform duration-500">
-                      {product.name.charAt(0)}
-                    </span>
-                  )}
-                  {product.featured && (
-                    <span className="absolute top-4 left-4 bg-teal text-white text-xs px-3 py-1 rounded-full z-10">
-                      Featured
-                    </span>
-                  )}
-                  {product.code && (
-                    <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
-                      {product.code}
-                    </span>
-                  )}
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-xs text-gold uppercase tracking-wider">{product.category}</p>
-                    {product.color && (
-                      <p className="text-xs text-gray-500">{product.color}</p>
-                    )}
-                  </div>
-                  <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
-                  <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
-                  {product.sizes && product.sizes.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {product.sizes.map((size) => (
-                        <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <p className="text-gold font-semibold text-lg">{product.price}</p>
-                    <span className="text-sm text-gray-400 group-hover:text-gold transition-colors">
-                      View Details &rarr;
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No products available at the moment.</p>
+              <p className="text-gray-400 mt-2">Check back soon for new arrivals!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -109,5 +87,83 @@ export default function Shop() {
         </div>
       </section>
     </>
+  )
+}
+
+// Product Card Component
+function ProductCard({ product }: { product: Product }) {
+  const isOutOfStock = product.inStock === false
+
+  return (
+    <Link
+      href={`/products/${product.id}`}
+      className={`card group ${isOutOfStock ? 'opacity-75' : ''}`}
+    >
+      <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <span className="text-6xl font-serif text-gold/40 group-hover:scale-110 transition-transform duration-500">
+            {product.name.charAt(0)}
+          </span>
+        )}
+        {product.featured && (
+          <span className="absolute top-4 left-4 bg-teal text-white text-xs px-3 py-1 rounded-full z-10">
+            Featured
+          </span>
+        )}
+        {product.originalPrice && !isOutOfStock && (
+          <span className="absolute top-4 left-4 bg-coral text-white text-xs px-3 py-1 rounded-full z-10">
+            Sale
+          </span>
+        )}
+        {isOutOfStock && (
+          <span className="absolute top-4 left-4 bg-gray-500 text-white text-xs px-3 py-1 rounded-full z-10">
+            Out of Stock
+          </span>
+        )}
+        {product.code && (
+          <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
+            {product.code}
+          </span>
+        )}
+      </div>
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-2">
+          <p className="text-xs text-gold uppercase tracking-wider">{product.category}</p>
+          {product.color && (
+            <p className="text-xs text-gray-500">{product.color}</p>
+          )}
+        </div>
+        <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
+        <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+        {product.sizes && product.sizes.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {product.sizes.map((size) => (
+              <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {size}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <p className="text-gold font-semibold text-lg">{product.price}</p>
+            {product.originalPrice && (
+              <p className="text-gray-400 line-through text-sm">{product.originalPrice}</p>
+            )}
+          </div>
+          <span className="text-sm text-gray-400 group-hover:text-gold transition-colors">
+            View Details &rarr;
+          </span>
+        </div>
+      </div>
+    </Link>
   )
 }

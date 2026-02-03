@@ -1,22 +1,32 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { products } from '@/data/products'
-import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
+import {
+  getProductById,
+  getRelatedProducts,
+  getSettings,
+  getAllProductIds,
+  Product
+} from '@/lib/data'
+import { getWhatsAppLink, getProductOrderMessage } from '@/lib/googleSheets'
 import ProductGallery from '@/components/ProductGallery'
 
 interface ProductPageProps {
   params: { id: string }
 }
 
+// Revalidate every 60 seconds to pick up Google Sheets changes
+export const revalidate = 60
+
+// Generate static paths for all products
 export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }))
+  const productIds = await getAllProductIds()
+  return productIds.map((id) => ({ id }))
 }
 
+// Generate metadata for SEO
 export async function generateMetadata({ params }: ProductPageProps) {
-  const product = products.find((p) => p.id === params.id)
+  const product = await getProductById(params.id)
   if (!product) return { title: 'Product Not Found' }
 
   return {
@@ -25,18 +35,27 @@ export async function generateMetadata({ params }: ProductPageProps) {
   }
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = products.find((p) => p.id === params.id)
+export default async function ProductPage({ params }: ProductPageProps) {
+  // Fetch product data
+  const [product, settings] = await Promise.all([
+    getProductById(params.id),
+    getSettings()
+  ])
 
   if (!product) {
     notFound()
   }
 
-  const whatsappMessage = `Hello! I'm interested in ordering "${product.name}" (${product.code || product.id}) - ${product.price} from House of Varsha.`
-  const whatsappLink = getWhatsAppLink(defaultSettings.whatsappNumber, whatsappMessage)
+  // Fetch related products
+  const relatedProducts = await getRelatedProducts(product.id, 3)
+
+  // Generate WhatsApp order link
+  const whatsappMessage = getProductOrderMessage(product)
+  const whatsappLink = getWhatsAppLink(settings.whatsappNumber, whatsappMessage)
 
   // Check if product has color variants
   const hasColorVariants = product.colorVariants && product.colorVariants.length > 0
+  const isOutOfStock = product.inStock === false
 
   return (
     <>
@@ -77,7 +96,25 @@ export default function ProductPage({ params }: ProductPageProps) {
             <div className="flex flex-col justify-center">
               <p className="text-sm text-taupe uppercase tracking-wider mb-2">{product.category}</p>
               <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">{product.name}</h1>
-              <p className="text-3xl font-semibold text-gold mb-6">{product.price}</p>
+
+              {/* Price */}
+              <div className="flex items-center gap-3 mb-6">
+                <p className="text-3xl font-semibold text-gold">{product.price}</p>
+                {product.originalPrice && (
+                  <>
+                    <p className="text-xl text-gray-400 line-through">{product.originalPrice}</p>
+                    <span className="bg-coral text-white text-xs px-2 py-1 rounded">Sale</span>
+                  </>
+                )}
+              </div>
+
+              {/* Stock Status */}
+              {isOutOfStock && (
+                <div className="mb-6 p-3 bg-gray-100 rounded-lg">
+                  <p className="text-gray-600 font-medium">Currently Out of Stock</p>
+                  <p className="text-sm text-gray-500">Contact us for availability updates</p>
+                </div>
+              )}
 
               <div className="prose prose-gray mb-6">
                 <p className="text-gray-600 leading-relaxed">{product.description}</p>
@@ -115,7 +152,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   <ul className="space-y-2">
                     {product.details.map((detail, index) => (
                       <li key={index} className="flex items-start text-gray-600">
-                        <span className="text-gold mr-2">•</span>
+                        <span className="text-gold mr-2">*</span>
                         {detail}
                       </li>
                     ))}
@@ -128,12 +165,12 @@ export default function ProductPage({ params }: ProductPageProps) {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-whatsapp justify-center text-lg"
+                className={`btn-whatsapp justify-center text-lg ${isOutOfStock ? 'opacity-75' : ''}`}
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                 </svg>
-                Order via WhatsApp
+                {isOutOfStock ? 'Inquire via WhatsApp' : 'Order via WhatsApp'}
               </a>
 
               <p className="text-sm text-gray-500 mt-4 text-center">
@@ -145,44 +182,55 @@ export default function ProductPage({ params }: ProductPageProps) {
       </section>
 
       {/* Related Products */}
-      <section className="section-padding bg-cream">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-serif text-gray-900 mb-8 text-center">You May Also Like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products
-              .filter((p) => p.id !== product.id && p.category === product.category)
-              .slice(0, 3)
-              .map((relatedProduct) => (
-                <Link href={`/products/${relatedProduct.id}`} key={relatedProduct.id} className="card group">
-                  <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
-                    {relatedProduct.image ? (
-                      <Image
-                        src={relatedProduct.image}
-                        alt={relatedProduct.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <span className="text-4xl font-serif text-gold/40 group-hover:scale-110 transition-transform">
-                        {relatedProduct.name.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-serif text-gray-900 mb-2">{relatedProduct.name}</h3>
-                    <div className="flex justify-between items-center">
-                      <p className="text-gold font-medium">{relatedProduct.price}</p>
-                      {relatedProduct.color && (
-                        <p className="text-xs text-gray-500">{relatedProduct.color}</p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
+      {relatedProducts.length > 0 && (
+        <section className="section-padding bg-cream">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-3xl font-serif text-gray-900 mb-8 text-center">You May Also Like</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedProducts.map((relatedProduct) => (
+                <RelatedProductCard key={relatedProduct.id} product={relatedProduct} />
               ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
+  )
+}
+
+// Related Product Card Component
+function RelatedProductCard({ product }: { product: Product }) {
+  return (
+    <Link href={`/products/${product.id}`} className="card group">
+      <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <span className="text-4xl font-serif text-gold/40 group-hover:scale-110 transition-transform">
+            {product.name.charAt(0)}
+          </span>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <p className="text-gold font-medium">{product.price}</p>
+            {product.originalPrice && (
+              <p className="text-gray-400 line-through text-sm">{product.originalPrice}</p>
+            )}
+          </div>
+          {product.color && (
+            <p className="text-xs text-gray-500">{product.color}</p>
+          )}
+        </div>
+      </div>
+    </Link>
   )
 }

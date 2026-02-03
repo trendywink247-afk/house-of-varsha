@@ -1,12 +1,20 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { products } from '@/data/products'
-import { getWhatsAppLink, defaultSettings } from '@/lib/googleSheets'
+import { getFeaturedProducts, getSettings, Product } from '@/lib/data'
+import { getWhatsAppLink, getProductOrderMessage } from '@/lib/googleSheets'
 
-export default function Home() {
-  const featuredProducts = products.filter(p => p.featured).slice(0, 3)
+// Revalidate every 60 seconds to pick up Google Sheets changes
+export const revalidate = 60
+
+export default async function Home() {
+  // Fetch data from Google Sheets (or fallback)
+  const [featuredProducts, settings] = await Promise.all([
+    getFeaturedProducts(3),
+    getSettings()
+  ])
+
   const whatsappLink = getWhatsAppLink(
-    defaultSettings.whatsappNumber,
+    settings.whatsappNumber,
     "Hello! I'm interested in House of Varsha products."
   )
 
@@ -17,10 +25,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-serif text-gray-900 mb-6 leading-tight">
-              {defaultSettings.logoText}
+              {settings.storeName}
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              {defaultSettings.tagline}
+              {settings.tagline}
             </p>
             <Link href="/shop" className="btn-primary inline-block">
               Explore Collection
@@ -70,42 +78,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="card group">
-                <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
-                  {product.image ? (
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  ) : (
-                    <span className="text-4xl font-serif text-gold/50 group-hover:scale-110 transition-transform">
-                      {product.name.charAt(0)}
-                    </span>
-                  )}
-                  {product.code && (
-                    <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
-                      {product.code}
-                    </span>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
-                  <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
-                  {product.sizes && product.sizes.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {product.sizes.map((size) => (
-                        <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-gold font-medium">{product.price}</p>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
@@ -138,5 +111,57 @@ export default function Home() {
         </div>
       </section>
     </>
+  )
+}
+
+// Product Card Component
+function ProductCard({ product }: { product: Product }) {
+  return (
+    <Link href={`/products/${product.id}`} className="card group">
+      <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        ) : (
+          <span className="text-4xl font-serif text-gold/50 group-hover:scale-110 transition-transform">
+            {product.name.charAt(0)}
+          </span>
+        )}
+        {product.code && (
+          <span className="absolute top-4 right-4 bg-white/90 text-gray-600 text-xs px-2 py-1 rounded z-10">
+            {product.code}
+          </span>
+        )}
+        {product.originalPrice && (
+          <span className="absolute top-4 left-4 bg-coral text-white text-xs px-2 py-1 rounded z-10">
+            Sale
+          </span>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
+        <p className="text-gray-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+        {product.sizes && product.sizes.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {product.sizes.map((size) => (
+              <span key={size} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {size}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="flex items-center gap-2">
+          <p className="text-gold font-medium">{product.price}</p>
+          {product.originalPrice && (
+            <p className="text-gray-400 line-through text-sm">{product.originalPrice}</p>
+          )}
+        </div>
+      </div>
+    </Link>
   )
 }
