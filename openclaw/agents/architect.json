@@ -1,6 +1,0 @@
-{
-  "name": "Architect",
-  "role": "System Designer & Decision Maker",
-  "model": "openai/gpt-4.1",
-  "memory": { "path": "memory/architect" }
-}

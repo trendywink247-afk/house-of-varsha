@@ -1,6 +1,0 @@
-{
-  "name": "Reviewer",
-  "role": "Reviews PRs, security, and logic",
-  "model": "openai/gpt-4.1",
-  "memory": { "path": "memory/reviewer" }
-}

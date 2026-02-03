@@ -1,6 +1,0 @@
-{
-  "name": "Ops",
-  "role": "Debugging, logs, deployments",
-  "model": "openai/gpt-4.1-mini",
-  "memory": { "path": "memory/ops" }
-}

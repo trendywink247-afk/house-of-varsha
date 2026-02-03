@@ -1,4 +1,0 @@
-Analyze the failure.
-Produce the smallest possible fix.
-Avoid repeating previously failed approaches.
-Retry with updated code or parameters.

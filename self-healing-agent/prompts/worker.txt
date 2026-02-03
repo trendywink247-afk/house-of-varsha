@@ -1,4 +1,0 @@
-Execute the task end-to-end.
-Write or modify code if needed.
-Call tools and APIs as required.
-Do not ask the human for help unless all recovery paths fail.

@@ -1,7 +1,0 @@
-{
-  "kind": "telegram",
-  "token": "8367971947:AAHRM6XgYfjYX7pWLXAuhGt_ciqBKUee-gw",
-  "poll_interval": 2000,
-  "parse_mode": "Markdown",
-  "allowed_updates": ["message", "edited_message"]
-}

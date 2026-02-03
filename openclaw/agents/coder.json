@@ -1,7 +1,0 @@
-{
-  "name": "Coder",
-  "role": "Writes and modifies code",
-  "model": "openai/gpt-4.1-mini",
-  "env": { "GITHUB_TOKEN": "env:GITHUB_TOKEN" },
-  "memory": { "path": "memory/coder" }
-}

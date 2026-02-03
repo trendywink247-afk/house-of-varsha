@@ -1,4 +1,0 @@
-Classify the task by complexity (low/medium/high).
-Decide whether it can be solved directly or needs planning.
-Prefer the cheapest model unless failure history suggests escalation.
-Return: { complexity, plan, model }
