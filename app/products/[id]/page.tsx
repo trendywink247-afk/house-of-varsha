@@ -6,10 +6,11 @@ import {
   getRelatedProducts,
   getSettings,
   getAllProductIds,
-  Product
+  Product,
 } from '@/lib/data'
 import { getWhatsAppLink, getProductOrderMessage } from '@/lib/googleSheets'
 import ProductGallery from '@/components/ProductGallery'
+import ProductCard, { ProductGrid } from '@/components/ProductCard'
 
 interface ProductPageProps {
   params: { id: string }
@@ -39,7 +40,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Fetch product data
   const [product, settings] = await Promise.all([
     getProductById(params.id),
-    getSettings()
+    getSettings(),
   ])
 
   if (!product) {
@@ -47,7 +48,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   // Fetch related products
-  const relatedProducts = await getRelatedProducts(product.id, 3)
+  const relatedProducts = await getRelatedProducts(product.id, 4)
 
   // Generate WhatsApp order link
   const whatsappMessage = getProductOrderMessage(product)
@@ -60,24 +61,28 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <>
       {/* Breadcrumb */}
-      <div className="bg-cream py-4">
-        <div className="max-w-6xl mx-auto px-4">
-          <nav className="text-sm text-gray-500">
-            <Link href="/" className="hover:text-gold">Home</Link>
-            <span className="mx-2">/</span>
-            <Link href="/shop" className="hover:text-gold">Shop</Link>
-            <span className="mx-2">/</span>
+      <div className="bg-white border-b border-gray-100">
+        <div className="container-editorial py-4">
+          <nav className="text-xs uppercase tracking-widest text-gray-400">
+            <Link href="/" className="hover:text-gray-900 transition-colors">
+              Home
+            </Link>
+            <span className="mx-3">/</span>
+            <Link href="/shop" className="hover:text-gray-900 transition-colors">
+              Shop
+            </Link>
+            <span className="mx-3">/</span>
             <span className="text-gray-900">{product.name}</span>
           </nav>
         </div>
       </div>
 
       {/* Product Detail */}
-      <section className="section-padding bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Gallery with Color Switcher */}
-            <div>
+      <section className="bg-white">
+        <div className="container-editorial py-12 md:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+            {/* Product Gallery */}
+            <div className="lg:sticky lg:top-24 lg:self-start">
               <ProductGallery
                 productName={product.name}
                 image={product.image}
@@ -85,58 +90,81 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 colorVariants={product.colorVariants}
                 color={product.color}
               />
-              {product.code && (
-                <p className="text-sm text-gray-500 mt-4">
-                  Product Code: <span className="font-medium">{product.code}</span>
-                </p>
-              )}
             </div>
 
             {/* Product Info */}
-            <div className="flex flex-col justify-center">
-              <p className="text-sm text-taupe uppercase tracking-wider mb-2">{product.category}</p>
-              <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">{product.name}</h1>
+            <div className="lg:py-8">
+              {/* Category & Code */}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+                  {product.category}
+                </p>
+                {product.code && (
+                  <p className="text-xs text-gray-400">
+                    Code: {product.code}
+                  </p>
+                )}
+              </div>
+
+              {/* Product Name */}
+              <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6 leading-tight">
+                {product.name}
+              </h1>
 
               {/* Price */}
-              <div className="flex items-center gap-3 mb-6">
-                <p className="text-3xl font-semibold text-gold">{product.price}</p>
+              <div className="flex items-center gap-4 mb-8">
+                <span className="text-2xl text-gray-900">{product.price}</span>
                 {product.originalPrice && (
                   <>
-                    <p className="text-xl text-gray-400 line-through">{product.originalPrice}</p>
-                    <span className="bg-coral text-white text-xs px-2 py-1 rounded">Sale</span>
+                    <span className="text-xl text-gray-400 line-through">
+                      {product.originalPrice}
+                    </span>
+                    <span className="badge badge-sale">Sale</span>
                   </>
                 )}
               </div>
 
               {/* Stock Status */}
               {isOutOfStock && (
-                <div className="mb-6 p-3 bg-gray-100 rounded-lg">
-                  <p className="text-gray-600 font-medium">Currently Out of Stock</p>
-                  <p className="text-sm text-gray-500">Contact us for availability updates</p>
+                <div className="mb-8 p-4 bg-gray-50 border border-gray-100">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Currently Sold Out</span>
+                    <br />
+                    <span className="text-gray-500">
+                      Contact us for availability updates
+                    </span>
+                  </p>
                 </div>
               )}
 
-              <div className="prose prose-gray mb-6">
-                <p className="text-gray-600 leading-relaxed">{product.description}</p>
+              {/* Description */}
+              <div className="mb-8">
+                <p className="text-gray-600 leading-relaxed">
+                  {product.description}
+                </p>
               </div>
 
-              {/* Available Colors (if not using gallery color picker) */}
+              {/* Color */}
               {!hasColorVariants && product.color && (
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-3">Color</h3>
-                  <p className="text-gray-600">{product.color}</p>
+                <div className="mb-8">
+                  <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-3">
+                    Color
+                  </h3>
+                  <p className="text-gray-900">{product.color}</p>
                 </div>
               )}
 
               {/* Available Sizes */}
               {product.sizes && product.sizes.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-medium text-gray-900 mb-3">Available Sizes</h3>
+                <div className="mb-8">
+                  <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-4">
+                    Available Sizes
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {product.sizes.map((size) => (
                       <span
                         key={size}
-                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:border-teal hover:text-gold transition-colors"
+                        className="w-12 h-12 flex items-center justify-center border border-gray-200 text-sm text-gray-700 hover:border-gray-900 transition-colors cursor-pointer"
                       >
                         {size}
                       </span>
@@ -147,12 +175,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               {/* Product Details */}
               {product.details && product.details.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="font-serif text-xl text-gray-900 mb-4">Product Details</h3>
+                <div className="mb-10 pt-8 border-t border-gray-100">
+                  <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-4">
+                    Product Details
+                  </h3>
                   <ul className="space-y-2">
                     {product.details.map((detail, index) => (
-                      <li key={index} className="flex items-start text-gray-600">
-                        <span className="text-gold mr-2">*</span>
+                      <li
+                        key={index}
+                        className="flex items-start text-sm text-gray-600"
+                      >
+                        <span className="w-1.5 h-1.5 bg-gray-300 rounded-full mt-2 mr-3 flex-shrink-0" />
                         {detail}
                       </li>
                     ))}
@@ -165,17 +198,63 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`btn-whatsapp justify-center text-lg ${isOutOfStock ? 'opacity-75' : ''}`}
+                className={`btn-whatsapp w-full ${isOutOfStock ? 'opacity-75' : ''}`}
               >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                {isOutOfStock ? 'Inquire via WhatsApp' : 'Order via WhatsApp'}
+                {isOutOfStock ? 'Inquire on WhatsApp' : 'Order via WhatsApp'}
               </a>
 
-              <p className="text-sm text-gray-500 mt-4 text-center">
+              <p className="text-xs text-center text-gray-400 mt-4">
                 We'll respond within 24 hours to confirm your order
               </p>
+
+              {/* Shipping & Returns Info */}
+              <div className="mt-10 pt-8 border-t border-gray-100 space-y-4">
+                <div className="flex items-start gap-3">
+                  <svg
+                    className="w-5 h-5 text-gray-400 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm text-gray-900">Free Shipping</p>
+                    <p className="text-xs text-gray-500">
+                      On orders above Rs. 2000
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <svg
+                    className="w-5 h-5 text-gray-400 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <p className="text-sm text-gray-900">Quality Assured</p>
+                    <p className="text-xs text-gray-500">
+                      Handpicked premium products
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -183,54 +262,33 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="section-padding bg-cream">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl font-serif text-gray-900 mb-8 text-center">You May Also Like</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {relatedProducts.map((relatedProduct) => (
-                <RelatedProductCard key={relatedProduct.id} product={relatedProduct} />
-              ))}
+        <section className="section-padding bg-cream border-t border-gray-100">
+          <div className="container-editorial">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-3">
+                  You May Also Like
+                </p>
+                <h2 className="font-serif text-3xl md:text-4xl text-gray-900">
+                  Similar Styles
+                </h2>
+              </div>
+              <Link
+                href="/shop"
+                className="link-underline text-sm uppercase tracking-widest text-gray-600 hidden md:block"
+              >
+                View All
+              </Link>
             </div>
+
+            <ProductGrid columns={4}>
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </ProductGrid>
           </div>
         </section>
       )}
     </>
-  )
-}
-
-// Related Product Card Component
-function RelatedProductCard({ product }: { product: Product }) {
-  return (
-    <Link href={`/products/${product.id}`} className="card group">
-      <div className="aspect-square bg-gradient-to-br from-teal/20 to-coral/20 flex items-center justify-center relative overflow-hidden">
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-        ) : (
-          <span className="text-4xl font-serif text-gold/40 group-hover:scale-110 transition-transform">
-            {product.name.charAt(0)}
-          </span>
-        )}
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-serif text-gray-900 mb-2">{product.name}</h3>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <p className="text-gold font-medium">{product.price}</p>
-            {product.originalPrice && (
-              <p className="text-gray-400 line-through text-sm">{product.originalPrice}</p>
-            )}
-          </div>
-          {product.color && (
-            <p className="text-xs text-gray-500">{product.color}</p>
-          )}
-        </div>
-      </div>
-    </Link>
   )
 }

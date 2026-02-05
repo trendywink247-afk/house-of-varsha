@@ -1,38 +1,393 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================================
+   ROOT VARIABLES & SMOOTH SCROLLING
+   ================================ */
+:root {
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  @apply bg-cream text-gray-800 font-sans antialiased;
+  @apply bg-white text-gray-900 font-sans antialiased;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
+/* ================================
+   EDITORIAL TYPOGRAPHY
+   ================================ */
 h1, h2, h3, h4, h5, h6 {
-  @apply font-serif;
+  @apply font-serif tracking-tight;
 }
 
+/* Premium serif styling */
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+/* ================================
+   ANIMATION UTILITIES
+   ================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s var(--transition-smooth) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s var(--transition-smooth) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s var(--transition-smooth) forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.6s var(--transition-smooth) forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.6s var(--transition-smooth) forwards;
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0.1s; opacity: 0; }
+.stagger-2 { animation-delay: 0.2s; opacity: 0; }
+.stagger-3 { animation-delay: 0.3s; opacity: 0; }
+.stagger-4 { animation-delay: 0.4s; opacity: 0; }
+.stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+/* ================================
+   PREMIUM BUTTONS
+   ================================ */
 .btn-primary {
-  @apply bg-teal text-white px-6 py-3 rounded-lg font-medium
-         hover:bg-opacity-90 transition-all duration-300
-         shadow-md hover:shadow-lg;
+  @apply bg-gray-900 text-white px-8 py-4 font-sans text-sm uppercase tracking-widest
+         transition-all duration-300 ease-out;
+}
+
+.btn-primary:hover {
+  @apply bg-gray-800;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  @apply border border-gray-900 text-gray-900 px-8 py-4 font-sans text-sm uppercase tracking-widest
+         bg-transparent transition-all duration-300 ease-out;
+}
+
+.btn-secondary:hover {
+  @apply bg-gray-900 text-white;
 }
 
 .btn-whatsapp {
-  @apply bg-green-500 text-white px-6 py-3 rounded-lg font-medium
-         hover:bg-green-600 transition-all duration-300
-         shadow-md hover:shadow-lg flex items-center gap-2;
+  @apply bg-[#25D366] text-white px-8 py-4 font-sans text-sm uppercase tracking-widest
+         transition-all duration-300 ease-out flex items-center justify-center gap-3;
 }
 
-.card {
-  @apply bg-white rounded-xl shadow-md hover:shadow-xl
-         transition-all duration-300 overflow-hidden;
+.btn-whatsapp:hover {
+  @apply bg-[#20BD5A];
+  transform: translateY(-1px);
 }
 
+/* ================================
+   PRODUCT CARD - BOUTIQUE STYLE
+   ================================ */
+.product-card {
+  @apply relative overflow-hidden bg-white;
+}
+
+.product-card .image-container {
+  @apply relative overflow-hidden;
+  aspect-ratio: 3/4;
+}
+
+.product-card .primary-image,
+.product-card .hover-image {
+  @apply absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out;
+}
+
+.product-card .hover-image {
+  @apply opacity-0;
+}
+
+.product-card:hover .primary-image {
+  @apply opacity-0;
+}
+
+.product-card:hover .hover-image {
+  @apply opacity-100;
+}
+
+/* Fallback for single image - scale on hover */
+.product-card.single-image:hover .primary-image {
+  @apply opacity-100;
+  transform: scale(1.05);
+}
+
+.product-card .info {
+  @apply py-5 px-1 text-center;
+}
+
+.product-card .name {
+  @apply font-serif text-lg text-gray-900 mb-1 tracking-tight;
+}
+
+.product-card .price {
+  @apply text-sm text-gray-600 tracking-wide;
+}
+
+/* Quick add overlay */
+.product-card .quick-add {
+  @apply absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm
+         py-4 text-center transform translate-y-full
+         transition-transform duration-300 ease-out;
+}
+
+.product-card:hover .quick-add {
+  transform: translateY(0);
+}
+
+/* ================================
+   SECTION LAYOUTS
+   ================================ */
 .section-padding {
-  @apply py-16 md:py-24;
+  @apply py-20 md:py-32;
+}
+
+.section-padding-sm {
+  @apply py-12 md:py-20;
+}
+
+.container-editorial {
+  @apply max-w-7xl mx-auto px-6 md:px-8 lg:px-12;
+}
+
+.container-narrow {
+  @apply max-w-4xl mx-auto px-6 md:px-8;
+}
+
+/* ================================
+   EDITORIAL GRID
+   ================================ */
+.grid-editorial {
+  @apply grid gap-4 md:gap-6;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .grid-editorial {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-editorial {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ================================
+   HERO SECTION STYLES
+   ================================ */
+.hero-editorial {
+  @apply relative min-h-[90vh] flex items-center justify-center overflow-hidden;
+}
+
+.hero-editorial .content {
+  @apply relative z-10 text-center px-6;
+}
+
+.hero-editorial .subtitle {
+  @apply text-xs md:text-sm uppercase tracking-[0.3em] text-gray-500 mb-6;
+}
+
+.hero-editorial .title {
+  @apply font-serif text-5xl md:text-7xl lg:text-8xl font-light text-gray-900 mb-6;
+  line-height: 1.1;
+}
+
+.hero-editorial .description {
+  @apply text-lg md:text-xl text-gray-600 max-w-xl mx-auto mb-10 font-light leading-relaxed;
+}
+
+/* ================================
+   MARQUEE ANIMATION
+   ================================ */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ================================
+   LINK UNDERLINE ANIMATION
+   ================================ */
+.link-underline {
+  @apply relative inline-block;
+}
+
+.link-underline::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-[1px] bg-current transition-all duration-300 ease-out;
+}
+
+.link-underline:hover::after {
+  @apply w-full;
+}
+
+/* ================================
+   IMAGE REVEAL ANIMATION
+   ================================ */
+.image-reveal {
+  @apply relative overflow-hidden;
+}
+
+.image-reveal::before {
+  content: '';
+  @apply absolute inset-0 bg-cream z-10 transition-transform duration-700 ease-out;
+  transform-origin: right;
+}
+
+.image-reveal.revealed::before {
+  transform: scaleX(0);
+}
+
+/* ================================
+   MINIMAL SCROLLBAR
+   ================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* ================================
+   MOBILE MENU ANIMATION
+   ================================ */
+.mobile-menu {
+  @apply fixed inset-0 bg-white z-50 transform transition-transform duration-500 ease-out;
+}
+
+.mobile-menu.closed {
+  transform: translateX(100%);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* ================================
+   BADGE STYLES
+   ================================ */
+.badge {
+  @apply inline-block text-[10px] uppercase tracking-widest px-3 py-1;
+}
+
+.badge-sale {
+  @apply bg-red-50 text-red-600;
+}
+
+.badge-new {
+  @apply bg-gray-900 text-white;
+}
+
+.badge-featured {
+  @apply bg-gold/10 text-gold;
+}
+
+/* ================================
+   NEWSLETTER INPUT
+   ================================ */
+.input-newsletter {
+  @apply w-full border-b border-gray-300 bg-transparent py-3 text-sm
+         focus:outline-none focus:border-gray-900 transition-colors duration-300
+         placeholder:text-gray-400;
+}
+
+/* ================================
+   LOADING SKELETON
+   ================================ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  @apply bg-gray-100;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
