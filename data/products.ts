@@ -3,19 +3,36 @@ import { Product, ColorVariant } from '@/lib/googleSheets'
 // Re-export types for convenience
 export type { Product, ColorVariant }
 
-// Default products - these will be used if Google Sheets is not configured
-// You can update these directly OR use Google Sheets for easy updates
+// ============================================
+// Hero Images Configuration
+// ============================================
+// After uploading images to Cloudinary using the upload script,
+// replace these with your actual Cloudinary public IDs.
 //
-// To use Cloudinary images, add:
-//   cloudinaryId: 'products/your-image-id'
+// Run: node scripts/upload-to-cloudinary.js ./your-images-folder
+// Then copy the hero image IDs here.
 //
-// Example with Cloudinary:
-//   {
-//     id: 'k001',
-//     name: 'Kalamkari Kurti',
-//     cloudinaryId: 'house-of-varsha/products/kurti-k001',
-//     ...
-//   }
+// Example:
+//   'house-of-varsha/hero/hero-1'
+//   'house-of-varsha/hero/hero-2'
+//
+export const heroImageIds: string[] = [
+  // Add your Cloudinary hero image IDs here after uploading
+  // 'house-of-varsha/hero/hero-1',
+  // 'house-of-varsha/hero/hero-2',
+  // 'house-of-varsha/hero/hero-3',
+  // 'house-of-varsha/hero/hero-4',
+  // 'house-of-varsha/hero/hero-5',
+]
+
+// ============================================
+// Default Products
+// ============================================
+// These will be used if Google Sheets is not configured.
+// After uploading images to Cloudinary, add cloudinaryId to each product.
+//
+// Run: node scripts/upload-to-cloudinary.js ./your-images-folder
+// Then add the product image IDs below.
 
 export const products: Product[] = [
   {
@@ -29,6 +46,7 @@ export const products: Product[] = [
     code: 'K001',
     featured: true,
     inStock: true,
+    // cloudinaryId: 'house-of-varsha/products/kurti-k001',
     details: [
       'Pure cotton fabric',
       'Traditional Kalamkari print',
@@ -46,6 +64,7 @@ export const products: Product[] = [
     color: 'Rust orange',
     code: 'K002',
     featured: true,
+    // cloudinaryId: 'house-of-varsha/products/kurti-k002',
     details: [
       'Pure cotton fabric',
       'Traditional Kalamkari print',
@@ -63,6 +82,7 @@ export const products: Product[] = [
     color: 'Lemon yellow',
     code: 'V001',
     featured: true,
+    // cloudinaryId: 'house-of-varsha/products/set-v001',
     details: [
       'Complete 3-piece set',
       'Pure cotton fabric',
@@ -79,6 +99,7 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     color: 'Lemon yellow',
     code: 'V002',
+    // cloudinaryId: 'house-of-varsha/products/set-v002',
     details: [
       'Complete 3-piece set',
       'Pure cotton fabric',
@@ -95,6 +116,7 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     color: 'Sea blue and gold',
     code: 'V003',
+    // cloudinaryId: 'house-of-varsha/products/set-v003',
     details: [
       'Complete 3-piece set',
       'Elegant color combination',
@@ -111,6 +133,7 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     color: 'Green',
     code: 'V004',
+    // cloudinaryId: 'house-of-varsha/products/set-v004',
     details: [
       'Complete 3-piece set',
       'Pure cotton fabric',
@@ -127,6 +150,7 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     color: 'Grey',
     code: 'V005',
+    // cloudinaryId: 'house-of-varsha/products/set-v005',
     details: [
       'Complete 3-piece set',
       'Pure cotton fabric',

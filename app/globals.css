@@ -378,6 +378,67 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ================================
+   HERO MOSAIC GRID
+   ================================ */
+.hero-mosaic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  height: 100%;
+}
+
+/* Mobile: 2x2 grid with first image spanning full width on top */
+@media (max-width: 767px) {
+  .hero-mosaic-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1.2fr 1fr 0.8fr;
+    gap: 2px;
+  }
+
+  .hero-mosaic-1 { grid-column: 1 / -1; grid-row: 1; }
+  .hero-mosaic-2 { grid-column: 1; grid-row: 2; }
+  .hero-mosaic-3 { grid-column: 2; grid-row: 2; }
+  .hero-mosaic-4 { grid-column: 1; grid-row: 3; }
+  .hero-mosaic-5 { grid-column: 2; grid-row: 3; }
+}
+
+/* Desktop: Asymmetric editorial grid */
+@media (min-width: 768px) {
+  .hero-mosaic-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    height: 100%;
+  }
+
+  .hero-mosaic-1 { grid-column: 1; grid-row: 1 / -1; }
+  .hero-mosaic-2 { grid-column: 2; grid-row: 1; }
+  .hero-mosaic-3 { grid-column: 3; grid-row: 1; }
+  .hero-mosaic-4 { grid-column: 2; grid-row: 2; }
+  .hero-mosaic-5 { grid-column: 3; grid-row: 2; }
+}
+
+.hero-mosaic-item {
+  @apply relative overflow-hidden;
+}
+
+/* Subtle zoom animation on hero images */
+@keyframes heroImageZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.hero-image-zoom {
+  animation: heroImageZoom 20s ease-in-out infinite alternate;
+}
+
+.hero-mosaic-2 .hero-image-zoom { animation-delay: -3s; }
+.hero-mosaic-3 .hero-image-zoom { animation-delay: -7s; }
+.hero-mosaic-4 .hero-image-zoom { animation-delay: -11s; }
+.hero-mosaic-5 .hero-image-zoom { animation-delay: -15s; }
+
+/* ================================
    LOADING SKELETON
    ================================ */
 @keyframes shimmer {

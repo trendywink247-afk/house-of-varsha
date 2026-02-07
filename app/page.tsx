@@ -1,11 +1,70 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getFeaturedProducts, getProducts, getSettings, Product } from '@/lib/data'
-import { getWhatsAppLink } from '@/lib/googleSheets'
+import { getWhatsAppLink, SiteSettings } from '@/lib/googleSheets'
+import { getCloudinaryUrl, isCloudinaryId } from '@/lib/cloudinary'
 import ProductCard, { ProductGrid } from '@/components/ProductCard'
+import HeroSection from '@/components/HeroSection'
+import { heroImageIds } from '@/data/products'
 
 // Revalidate every 60 seconds to pick up Google Sheets changes
 export const revalidate = 60
+
+/**
+ * Resolve an image identifier to a full URL (server-side only).
+ * Handles both Cloudinary public IDs and regular URLs.
+ */
+function resolveImageUrl(src: string): string {
+  if (!src) return ''
+  if (isCloudinaryId(src)) {
+    return getCloudinaryUrl(src, {
+      width: 800,
+      height: 1040,
+      crop: 'fill',
+      quality: 'auto',
+      gravity: 'auto',
+    })
+  }
+  return src
+}
+
+/**
+ * Get resolved hero image URLs from settings or fall back to product images.
+ * All Cloudinary IDs are resolved to full URLs server-side.
+ * Priority: settings.heroCloudinaryIds > heroImageIds config > product cloudinaryIds > product URLs
+ */
+function getHeroImages(settings: SiteSettings, products: Product[]): string[] {
+  // 1. Use dedicated hero images from settings (Google Sheets)
+  if (settings.heroCloudinaryIds && settings.heroCloudinaryIds.length > 0) {
+    return settings.heroCloudinaryIds.map(resolveImageUrl)
+  }
+
+  // 2. Use single hero image from settings
+  if (settings.heroCloudinaryId) {
+    return [resolveImageUrl(settings.heroCloudinaryId)]
+  }
+
+  // 3. Use hero image IDs from data/products.ts configuration
+  if (heroImageIds.length > 0) {
+    return heroImageIds.map(resolveImageUrl)
+  }
+
+  // 4. Fall back to product images with Cloudinary IDs
+  const productImages = products
+    .filter(p => p.cloudinaryId)
+    .map(p => resolveImageUrl(p.cloudinaryId!))
+    .slice(0, 5)
+
+  if (productImages.length > 0) return productImages
+
+  // 5. Fall back to product image URLs (already resolved)
+  const productUrls = products
+    .filter(p => p.image)
+    .map(p => p.image!)
+    .slice(0, 5)
+
+  return productUrls
+}
 
 export default async function Home() {
   // Fetch data from Google Sheets (or fallback)
@@ -25,52 +84,12 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero Section - Editorial Style */}
-      <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center bg-cream overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-coral/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal/10 rounded-full blur-3xl" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <p className="animate-fade-in-up stagger-1 text-xs md:text-sm uppercase tracking-[0.3em] text-gray-500 mb-6">
-            Handcrafted Indian Ethnic Wear
-          </p>
-          <h1 className="animate-fade-in-up stagger-2 font-serif text-5xl md:text-7xl lg:text-8xl font-light text-gray-900 mb-6 leading-[1.1]">
-            {settings.storeName}
-          </h1>
-          <p className="animate-fade-in-up stagger-3 text-lg md:text-xl text-gray-600 max-w-xl mx-auto mb-10 font-light leading-relaxed">
-            {settings.tagline}
-          </p>
-          <div className="animate-fade-in-up stagger-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/shop" className="btn-primary">
-              Explore Collection
-            </Link>
-            <Link href="/about" className="btn-secondary">
-              Our Story
-            </Link>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <svg
-            className="w-6 h-6 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </div>
-      </section>
+      {/* Hero Section - Multi-Image Mosaic */}
+      <HeroSection
+        storeName={settings.storeName}
+        tagline={settings.tagline}
+        heroImages={getHeroImages(settings, allProducts)}
+      />
 
       {/* Marquee Banner */}
       <div className="bg-gray-900 text-white py-3 overflow-hidden">

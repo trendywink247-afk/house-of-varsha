@@ -45,6 +45,8 @@ export interface SiteSettings {
   email: string
   heroCloudinaryId?: string
   heroImage?: string
+  heroCloudinaryIds?: string[]  // Multiple hero image Cloudinary IDs for mosaic
+  heroImages?: string[]         // Resolved hero image URLs
 }
 
 // ============================================
@@ -210,6 +212,14 @@ async function fetchSettingsViaAPI(sheetId: string): Promise<SiteSettings | null
       }
     }
 
+    // Parse multiple hero images (comma-separated Cloudinary IDs)
+    const heroIdsStr = settings.herocloudinaryids || settings.hero_cloudinary_ids || ''
+    const heroCloudinaryIds = heroIdsStr
+      ? heroIdsStr.split(',').map((id: string) => id.trim()).filter(Boolean)
+      : settings.herocloudinaryid
+        ? [settings.herocloudinaryid]
+        : []
+
     return {
       storeName: settings.storename || settings.store_name || defaultSettings.storeName,
       logoCloudinaryId: settings.logocloudinaryid || settings.logo_cloudinary_id,
@@ -223,7 +233,11 @@ async function fetchSettingsViaAPI(sheetId: string): Promise<SiteSettings | null
       heroCloudinaryId: settings.herocloudinaryid || settings.hero_cloudinary_id,
       heroImage: settings.herocloudinaryid
         ? getCloudinaryUrl(settings.herocloudinaryid, 'full')
-        : settings.heroimage
+        : settings.heroimage,
+      heroCloudinaryIds: heroCloudinaryIds.length > 0 ? heroCloudinaryIds : undefined,
+      heroImages: heroCloudinaryIds.length > 0
+        ? heroCloudinaryIds.map((id: string) => getCloudinaryUrl(id, 'full'))
+        : undefined,
     }
   } catch (error) {
     console.error('Error fetching settings via API:', error)
