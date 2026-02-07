@@ -100,9 +100,11 @@ export default function Header({ cartCount = 0, onCartClick }: HeaderProps) {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="font-display text-2xl md:text-3xl text-burgundy tracking-tight">
-                  {defaultSettings.storeName}
-                </span>
+                <img 
+                  src="/logo.jpg" 
+                  alt={defaultSettings.storeName}
+                  className="h-16 md:h-20 w-auto object-contain"
+                />
               </motion.div>
             </Link>
 

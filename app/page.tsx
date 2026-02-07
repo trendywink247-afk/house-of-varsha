@@ -224,10 +224,11 @@ export default function Home() {
                 transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute inset-0"
               >
-                <div className="absolute inset-0 bg-burgundy/10" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="font-display text-9xl text-burgundy/10">H</span>
-                </div>
+                <img
+                  src="/images/story-craftsmanship.jpg"
+                  alt="Craftsmanship"
+                  className="w-full h-full object-cover"
+                />
               </motion.div>
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-cream-dark/20 lg:to-transparent" />
