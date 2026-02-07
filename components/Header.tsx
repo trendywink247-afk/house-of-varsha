@@ -1,60 +1,91 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X, ShoppingBag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { defaultSettings } from '@/lib/utils';
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+interface HeaderProps {
+  cartCount?: number;
+  onCartClick?: () => void;
+}
 
-  // Handle scroll effect
+export default function Header({ cartCount = 0, onCartClick }: HeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isMenuOpen])
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/shop', label: 'Shop' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
-  ]
+  ];
+
+  const isActive = (path: string) => {
+    if (path === '/') return pathname === '/';
+    return pathname.startsWith(path);
+  };
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
+      <motion.header
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ${
           isScrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-sm'
+            ? 'bg-cream/95 backdrop-blur-md shadow-lg'
             : 'bg-transparent'
         }`}
       >
         <div className="container-editorial">
-          <div className="flex justify-between items-center h-16 md:h-20">
+          <div className="flex justify-between items-center h-24 md:h-28">
             {/* Left Navigation - Desktop */}
-            <nav className="hidden md:flex items-center space-x-8 flex-1">
-              {navLinks.map((link) => (
+            <nav className="hidden md:flex items-center space-x-12 flex-1">
+              {navLinks.slice(1, 3).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm uppercase tracking-widest text-gray-700 hover:text-gray-900 link-underline transition-colors duration-300"
+                  className={`relative text-xs uppercase tracking-[0.25em] font-medium transition-colors duration-300 ${
+                    isActive(link.href)
+                      ? 'text-burgundy'
+                      : 'text-burgundy/60 hover:text-burgundy'
+                  }`}
                 >
                   {link.label}
+                  {isActive(link.href) && (
+                    <motion.span
+                      layoutId="navIndicator"
+                      className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gold"
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
                 </Link>
               ))}
             </nav>
@@ -62,126 +93,164 @@ export default function Header() {
             {/* Center Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 hover:opacity-90 transition-all duration-300 hover:scale-105"
+              className="flex items-center justify-center flex-shrink-0 group"
             >
-              <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden shadow-lg ring-2 ring-gold/30">
-                <Image
-                  src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770479557/house-of-varsha/logo.jpg"
-                  alt="House of Varsha"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg md:text-xl font-serif font-medium text-gray-900 tracking-tight">
-                  House of Varsha
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+              >
+                <span className="font-display text-2xl md:text-3xl text-burgundy tracking-tight">
+                  {defaultSettings.storeName}
                 </span>
-              </div>
+              </motion.div>
             </Link>
 
             {/* Right Side - Desktop */}
-            <div className="hidden md:flex items-center justify-end space-x-6 flex-1">
+            <div className="hidden md:flex items-center justify-end space-x-12 flex-1">
               <Link
-                href="/shop"
-                className="text-sm uppercase tracking-widest text-gray-700 hover:text-gray-900 link-underline transition-colors duration-300"
+                href="/contact"
+                className={`relative text-xs uppercase tracking-[0.25em] font-medium transition-colors duration-300 ${
+                  isActive('/contact')
+                    ? 'text-burgundy'
+                    : 'text-burgundy/60 hover:text-burgundy'
+                }`}
               >
-                View All
+                Contact
+                {isActive('/contact') && (
+                  <motion.span
+                    layoutId="navIndicator"
+                    className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gold"
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
               </Link>
+              
+              {/* Cart Button */}
+              <motion.button
+                onClick={onCartClick}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative text-burgundy/60 hover:text-burgundy transition-colors duration-300"
+                aria-label="Open cart"
+              >
+                <ShoppingBag className="w-6 h-6" strokeWidth={1.5} />
+                {cartCount > 0 && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-burgundy text-cream text-[10px] flex items-center justify-center font-bold"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </motion.button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden relative w-10 h-10 flex items-center justify-center"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <div className="relative w-6 h-4 flex flex-col justify-between">
-                <span
-                  className={`block h-[1.5px] bg-gray-900 transform transition-all duration-300 origin-center ${
-                    isMenuOpen ? 'rotate-45 translate-y-[7px]' : ''
-                  }`}
-                />
-                <span
-                  className={`block h-[1.5px] bg-gray-900 transition-all duration-300 ${
-                    isMenuOpen ? 'opacity-0' : ''
-                  }`}
-                />
-                <span
-                  className={`block h-[1.5px] bg-gray-900 transform transition-all duration-300 origin-center ${
-                    isMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''
-                  }`}
-                />
-              </div>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 bg-white z-50 transform transition-transform duration-500 ease-out ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        {/* Close Button */}
-        <button
-          className="absolute top-5 right-6 w-10 h-10 flex items-center justify-center"
-          onClick={() => setIsMenuOpen(false)}
-          aria-label="Close menu"
-        >
-          <div className="relative w-6 h-6">
-            <span className="absolute top-1/2 left-0 w-full h-[1.5px] bg-gray-900 transform -translate-y-1/2 rotate-45" />
-            <span className="absolute top-1/2 left-0 w-full h-[1.5px] bg-gray-900 transform -translate-y-1/2 -rotate-45" />
-          </div>
-        </button>
-
-        {/* Mobile Menu Content */}
-        <div className="h-full flex flex-col justify-center items-center px-6">
-          <nav className="text-center space-y-8">
-            <Link
-              href="/"
-              className="block text-3xl font-serif text-gray-900 hover:text-gold transition-colors duration-300"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            {navLinks.map((link, index) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block text-3xl font-serif text-gray-900 hover:text-gold transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
+            {/* Mobile Right Side */}
+            <div className="flex md:hidden items-center gap-4">
+              <motion.button
+                onClick={onCartClick}
+                whileTap={{ scale: 0.95 }}
+                className="relative text-burgundy"
+                aria-label="Open cart"
               >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+                <ShoppingBag className="w-6 h-6" strokeWidth={1.5} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-burgundy text-cream text-[10px] flex items-center justify-center font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </motion.button>
 
-          {/* Mobile Menu Footer */}
-          <div className="absolute bottom-12 left-0 right-0 text-center">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 opacity-60"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Image
-                src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770479557/house-of-varsha/logo.jpg"
-                alt="House of Varsha"
-                width={32}
-                height={32}
-                className="object-contain"
-              />
-              <span className="text-sm font-serif text-gray-600">
-                House of Varsha
-              </span>
-            </Link>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="relative w-10 h-10 flex items-center justify-center text-burgundy"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? (
+                  <X className="w-6 h-6" strokeWidth={1.5} />
+                ) : (
+                  <Menu className="w-6 h-6" strokeWidth={1.5} />
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
+      </motion.header>
+
+      {/* Mobile Menu Overlay - DRAMATIC */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-burgundy z-50 md:hidden"
+          >
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
+            
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0, rotate: -90 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              exit={{ opacity: 0, rotate: 90 }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center text-cream border border-cream/20"
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <X className="w-6 h-6" strokeWidth={1.5} />
+            </motion.button>
+
+            {/* Mobile Menu Content */}
+            <div className="h-full flex flex-col justify-center items-center px-6 relative">
+              <nav className="text-center space-y-8">
+                {navLinks.map((link, index) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, y: 30, rotateX: -45 }}
+                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`block text-4xl font-display tracking-tight transition-colors duration-300 ${
+                        isActive(link.href)
+                          ? 'text-gold'
+                          : 'text-cream/80 hover:text-gold'
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </nav>
+
+              {/* Mobile Menu Footer */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="absolute bottom-12 left-0 right-0 text-center"
+              >
+                <span className="font-display text-xl text-cream/50">
+                  {defaultSettings.storeName}
+                </span>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Spacer for fixed header */}
-      <div className="h-16 md:h-20" />
+      <div className="h-24 md:h-28" />
     </>
-  )
+  );
 }
