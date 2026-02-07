@@ -5,9 +5,14 @@
   "scripts": {
     "dev": "node dev-server.js",
     "dev:standard": "next dev",
+    "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf node_modules .next",
+    "reset": "npm run clean && npm install",
+    "check-port": "netstat -ano | findstr :3000",
+    "kill-port": "npx kill-port 3000"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

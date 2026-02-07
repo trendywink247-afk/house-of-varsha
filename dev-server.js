@@ -24,15 +24,16 @@ function startServer() {
   // Set environment variables for stability
   const env = {
     ...process.env,
-    NODE_OPTIONS: '--max-old-space-size=4096 --no-warnings',
+    NODE_OPTIONS: '--max-old-space-size=4096',
     NEXT_TELEMETRY_DISABLED: '1',
-    WATCHPACK_POLLING: 'true',
+    // Disable polling for Windows stability
   };
 
-  serverProcess = spawn('npx', ['next', 'dev'], {
+  serverProcess = spawn('npx', ['next', 'dev', '--turbopack'], {
     stdio: 'inherit',
     shell: true,
     env,
+    detached: false,
   });
 
   serverProcess.on('error', (error) => {
