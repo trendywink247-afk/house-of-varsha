@@ -29,7 +29,7 @@ function startServer() {
     // Disable polling for Windows stability
   };
 
-  serverProcess = spawn('npx', ['next', 'dev', '--turbopack'], {
+  serverProcess = spawn('npx', ['next', 'dev'], {
     stdio: 'inherit',
     shell: true,
     env,
