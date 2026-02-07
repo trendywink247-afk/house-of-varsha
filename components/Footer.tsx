@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/googleSheets'
+import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/utils'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -14,22 +14,23 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-3 mb-6">
-              <Image
-                src="/logo.png"
-                alt="House of Varsha"
-                width={40}
-                height={40}
-                className="w-10 h-10 brightness-0 invert opacity-80"
-              />
-              <span className="font-serif text-xl text-white">
+            <Link href="/" className="inline-flex items-center gap-3 mb-6 group">
+              <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden shadow-xl ring-2 ring-gold/50 group-hover:ring-gold transition-all duration-300">
+                <Image
+                  src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770479557/house-of-varsha/logo.jpg"
+                  alt="House of Varsha"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="font-serif text-xl md:text-2xl text-white group-hover:text-gold transition-colors duration-300">
                 House of Varsha
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm mb-6">
-              Curating authentic Indian ethnic wear with a focus on quality,
-              tradition, and modern elegance. Each piece is handpicked to bring
-              you the best of Indian craftsmanship.
+              Celebrating the art of Indian craftsmanship. Each piece in our collection 
+              tells a story of heritage, passion, and timeless elegance. We bring you 
+              authentic ethnic wear that honors tradition while embracing modern style.
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-4">
@@ -137,7 +138,7 @@ export default function Footer() {
             &copy; {currentYear} {defaultSettings.storeName}. All rights reserved.
           </p>
           <p className="text-xs text-gray-600">
-            Crafted with care
+            Crafted by GeekSpace
           </p>
         </div>
       </div>

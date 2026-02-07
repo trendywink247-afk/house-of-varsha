@@ -11,11 +11,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const isOutOfStock = product.inStock === false
-  const hasHoverImage = product.images && product.images.length > 1
-
+  
   // Get primary and hover images
   const primaryImage = product.image
-  const hoverImage = hasHoverImage ? product.images![1] : null
+  const hoverImage = product.hoverImage || (product.images && product.images.length > 1 ? product.images[1] : null)
+  const hasHoverImage = !!hoverImage && hoverImage !== primaryImage
 
   return (
     <Link

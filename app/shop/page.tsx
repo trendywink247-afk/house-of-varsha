@@ -1,28 +1,61 @@
+'use client'
+
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { getProducts, getSettings, getCategories } from '@/lib/data'
-import { getWhatsAppLink } from '@/lib/googleSheets'
+import Image from 'next/image'
+import { products } from '@/data/products'
+import { getWhatsAppLink, defaultSettings } from '@/lib/utils'
 import ProductCard, { ProductGrid } from '@/components/ProductCard'
 
-export const metadata = {
-  title: 'Shop - House of Varsha',
-  description: 'Explore our curated collection of premium handcrafted kurtis and kurti sets.',
+// Get unique categories from products
+const getCategories = () => {
+  const categories = new Set(products.map(p => p.category).filter(Boolean))
+  return Array.from(categories)
 }
 
-// Revalidate every 60 seconds to pick up Google Sheets changes
-export const revalidate = 60
+// Parse price for sorting
+const parsePrice = (price: string): number => {
+  const num = price.replace(/[^0-9]/g, '')
+  return parseInt(num) || 0
+}
 
-export default async function Shop() {
-  // Fetch data from Google Sheets (or fallback)
-  const [products, settings, categories] = await Promise.all([
-    getProducts(),
-    getSettings(),
-    getCategories(),
-  ])
+export default function Shop() {
+  const [sortBy, setSortBy] = useState('Featured')
+  const categories = getCategories()
 
   const whatsappLink = getWhatsAppLink(
-    settings.whatsappNumber,
+    defaultSettings.whatsappNumber,
     "Hello! I'm interested in a custom order from House of Varsha."
   )
+
+  // Sort products based on selection
+  const sortedProducts = useMemo(() => {
+    const sorted = [...products]
+    
+    switch (sortBy) {
+      case 'Price: Low to High':
+        sorted.sort((a, b) => parsePrice(a.price) - parsePrice(b.price))
+        break
+      case 'Price: High to Low':
+        sorted.sort((a, b) => parsePrice(b.price) - parsePrice(a.price))
+        break
+      case 'Newest':
+        // Products with higher IDs are considered newer
+        sorted.sort((a, b) => b.id.localeCompare(a.id))
+        break
+      case 'Featured':
+      default:
+        // Featured products first, then by ID
+        sorted.sort((a, b) => {
+          if (a.featured && !b.featured) return -1
+          if (!a.featured && b.featured) return 1
+          return 0
+        })
+        break
+    }
+    
+    return sorted
+  }, [sortBy])
 
   return (
     <>
@@ -63,11 +96,15 @@ export default async function Shop() {
       <div className="border-y border-gray-100 bg-white">
         <div className="container-editorial py-4 flex items-center justify-between">
           <p className="text-sm text-gray-500">
-            {products.length} {products.length === 1 ? 'product' : 'products'}
+            {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'}
           </p>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">Sort by:</span>
-            <select className="text-sm text-gray-900 bg-transparent border-none focus:outline-none cursor-pointer">
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="text-sm text-gray-900 bg-transparent border-none focus:outline-none cursor-pointer"
+            >
               <option>Featured</option>
               <option>Newest</option>
               <option>Price: Low to High</option>
@@ -80,7 +117,7 @@ export default async function Shop() {
       {/* Products Grid */}
       <section className="section-padding bg-white">
         <div className="container-editorial">
-          {products.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <div className="text-center py-20">
               <p className="font-serif text-2xl text-gray-400 mb-4">
                 No products available
@@ -91,7 +128,7 @@ export default async function Shop() {
             </div>
           ) : (
             <ProductGrid columns={4}>
-              {products.map((product, index) => (
+              {sortedProducts.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}

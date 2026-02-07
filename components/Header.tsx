@@ -62,15 +62,16 @@ export default function Header() {
             {/* Center Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-300"
+              className="flex items-center gap-3 hover:opacity-90 transition-all duration-300 hover:scale-105"
             >
-              <Image
-                src="/logo.png"
-                alt="House of Varsha"
-                width={44}
-                height={44}
-                className="w-10 h-10 md:w-11 md:h-11"
-              />
+              <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden shadow-lg ring-2 ring-gold/30">
+                <Image
+                  src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770479557/house-of-varsha/logo.jpg"
+                  alt="House of Varsha"
+                  fill
+                  className="object-cover"
+                />
+              </div>
               <div className="hidden sm:block">
                 <span className="text-lg md:text-xl font-serif font-medium text-gray-900 tracking-tight">
                   House of Varsha
@@ -165,10 +166,11 @@ export default function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               <Image
-                src="/logo.png"
+                src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770479557/house-of-varsha/logo.jpg"
                 alt="House of Varsha"
                 width={32}
                 height={32}
+                className="object-contain"
               />
               <span className="text-sm font-serif text-gray-600">
                 House of Varsha

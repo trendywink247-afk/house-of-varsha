@@ -1,4 +1,4 @@
-import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/googleSheets'
+import { getWhatsAppLink, getInstagramLink, defaultSettings } from '@/lib/utils'
 
 export const metadata = {
   title: 'Contact Us - House of Varsha',

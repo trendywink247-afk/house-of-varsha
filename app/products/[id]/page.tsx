@@ -1,14 +1,11 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import {
-  getProductById,
-  getRelatedProducts,
-  getSettings,
-  getAllProductIds,
-  Product,
-} from '@/lib/data'
-import { getWhatsAppLink, getProductOrderMessage } from '@/lib/googleSheets'
+import { products } from '@/data/products'
+import { getWhatsAppLink, defaultSettings } from '@/lib/utils'
 import ProductGallery from '@/components/ProductGallery'
 import ProductCard, { ProductGrid } from '@/components/ProductCard'
 
@@ -16,46 +13,51 @@ interface ProductPageProps {
   params: { id: string }
 }
 
-// Revalidate every 60 seconds to pick up Google Sheets changes
-export const revalidate = 60
-
-// Generate static paths for all products
-export async function generateStaticParams() {
-  const productIds = await getAllProductIds()
-  return productIds.map((id) => ({ id }))
+// Get product by ID
+const getProductById = (id: string) => {
+  return products.find(p => p.id === id)
 }
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: ProductPageProps) {
-  const product = await getProductById(params.id)
-  if (!product) return { title: 'Product Not Found' }
-
-  return {
-    title: `${product.name} - House of Varsha`,
-    description: product.description,
-  }
+// Get related products
+const getRelatedProducts = (currentId: string, limit: number = 4) => {
+  return products
+    .filter(p => p.id !== currentId)
+    .slice(0, limit)
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params }: ProductPageProps) {
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  
   // Fetch product data
-  const [product, settings] = await Promise.all([
-    getProductById(params.id),
-    getSettings(),
-  ])
+  const product = getProductById(params.id)
 
   if (!product) {
     notFound()
   }
 
   // Fetch related products
-  const relatedProducts = await getRelatedProducts(product.id, 4)
+  const relatedProducts = getRelatedProducts(product.id, 4)
 
-  // Generate WhatsApp order link
-  const whatsappMessage = getProductOrderMessage(product)
-  const whatsappLink = getWhatsAppLink(settings.whatsappNumber, whatsappMessage)
+  // Generate WhatsApp order link with selected size
+  const getWhatsAppMessage = () => {
+    let message = `Hello! I'm interested in ordering:\n\n` +
+      `Product: ${product.name}\n` +
+      `Code: ${product.code}\n` +
+      `Price: ${product.price}`
+    
+    if (selectedSize) {
+      message += `\nSize: ${selectedSize}`
+    }
+    
+    message += `\n\nPlease confirm availability.`
+    return message
+  }
 
-  // Check if product has color variants
-  const hasColorVariants = product.colorVariants && product.colorVariants.length > 0
+  const whatsappLink = getWhatsAppLink(
+    defaultSettings.whatsappNumber, 
+    getWhatsAppMessage()
+  )
+
   const isOutOfStock = product.inStock === false
 
   return (
@@ -87,7 +89,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 productName={product.name}
                 image={product.image}
                 images={product.images}
-                colorVariants={product.colorVariants}
                 color={product.color}
               />
             </div>
@@ -145,7 +146,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
 
               {/* Color */}
-              {!hasColorVariants && product.color && (
+              {product.color && (
                 <div className="mb-8">
                   <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-3">
                     Color
@@ -154,22 +155,32 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               )}
 
-              {/* Available Sizes */}
+              {/* Available Sizes with Selection */}
               {product.sizes && product.sizes.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-4">
-                    Available Sizes
+                    Select Size {selectedSize && <span className="text-gold">({selectedSize})</span>}
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {product.sizes.map((size) => (
-                      <span
+                      <button
                         key={size}
-                        className="w-12 h-12 flex items-center justify-center border border-gray-200 text-sm text-gray-700 hover:border-gray-900 transition-colors cursor-pointer"
+                        onClick={() => setSelectedSize(size)}
+                        className={`w-14 h-14 flex items-center justify-center text-sm font-medium transition-all duration-300 ${
+                          selectedSize === size
+                            ? 'bg-gray-900 text-white border-2 border-gray-900 shadow-lg transform scale-105'
+                            : 'border-2 border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-md'
+                        }`}
                       >
                         {size}
-                      </span>
+                      </button>
                     ))}
                   </div>
+                  {!selectedSize && (
+                    <p className="text-xs text-gray-400 mt-2">
+                      Please select a size to continue
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -185,7 +196,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         key={index}
                         className="flex items-start text-sm text-gray-600"
                       >
-                        <span className="w-1.5 h-1.5 bg-gray-300 rounded-full mt-2 mr-3 flex-shrink-0" />
+                        <span className="w-1.5 h-1.5 bg-gold rounded-full mt-2 mr-3 flex-shrink-0" />
                         {detail}
                       </li>
                     ))}
@@ -198,12 +209,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`btn-whatsapp w-full ${isOutOfStock ? 'opacity-75' : ''}`}
+                className={`btn-whatsapp w-full flex items-center justify-center gap-3 ${
+                  isOutOfStock ? 'opacity-75' : ''
+                } ${!selectedSize ? 'opacity-90' : ''}`}
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                {isOutOfStock ? 'Inquire on WhatsApp' : 'Order via WhatsApp'}
+                {isOutOfStock ? 'Inquire on WhatsApp' : selectedSize ? `Order ${selectedSize} via WhatsApp` : 'Select Size to Order'}
               </a>
 
               <p className="text-xs text-center text-gray-400 mt-4">
@@ -214,7 +227,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="mt-10 pt-8 border-t border-gray-100 space-y-4">
                 <div className="flex items-start gap-3">
                   <svg
-                    className="w-5 h-5 text-gray-400 mt-0.5"
+                    className="w-5 h-5 text-gold mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -235,7 +248,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
                 <div className="flex items-start gap-3">
                   <svg
-                    className="w-5 h-5 text-gray-400 mt-0.5"
+                    className="w-5 h-5 text-gold mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
