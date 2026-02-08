@@ -1,22 +1,8 @@
 // Cloudinary Integration for House of Varsha
 // Provides utilities for image URLs and transformations
 
-import { v2 as cloudinary } from 'cloudinary'
-
-// Configure Cloudinary (for server-side operations)
-if (process.env.CLOUDINARY_API_KEY) {
-  cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true
-  })
-}
-
-// Get the Cloudinary cloud name for URL construction
-export function getCloudName(): string {
-  return process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ''
-}
+// Cloud name from environment
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dv6de0ucq'
 
 // Image transformation presets
 export const imagePresets = {
@@ -59,8 +45,6 @@ export function getCloudinaryUrl(
   publicId: string,
   options?: ImagePreset | TransformOptions
 ): string {
-  const cloudName = getCloudName()
-
   if (!cloudName) {
     console.warn('Cloudinary cloud name not configured')
     return publicId // Return as-is if not configured
@@ -107,7 +91,6 @@ export function getCloudinarySrcSet(
   publicId: string,
   widths: number[] = [400, 600, 800, 1200]
 ): string {
-  const cloudName = getCloudName()
   if (!cloudName || publicId.startsWith('http')) return ''
 
   return widths
@@ -127,7 +110,6 @@ export function getOptimizedImageUrl(publicId: string, width?: number): string {
     return publicId
   }
 
-  const cloudName = getCloudName()
   if (!cloudName) return publicId
 
   const transforms = width
@@ -141,7 +123,6 @@ export function getOptimizedImageUrl(publicId: string, width?: number): string {
  * Parse a Cloudinary URL to extract the public ID
  */
 export function parseCloudinaryUrl(url: string): string | null {
-  const cloudName = getCloudName()
   if (!cloudName || !url.includes('cloudinary.com')) return null
 
   // Match pattern: /upload/[transforms/]publicId
@@ -165,11 +146,29 @@ export function getBlurDataUrl(publicId: string): string {
     return 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsLCgwMDQ8SDwsNEA4QDA0OExMUFBEVFREMDxcYFhQYEhT/2wBDAQMEBAUEBQkFBQkUDA0MFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAAKAAoDAREAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAX/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAGkAB//xAAUEAEAAAAAAAAAAAAAAAAAAAAQ/9oACAEBAAEFAn//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/AT//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/AT//xAAUEAEAAAAAAAAAAAAAAAAAAAAQ/9oACAEBAAY/An//xAAUEAEAAAAAAAAAAAAAAAAAAAAQ/9oACAEBAAE/IX//2gAMAwEAAgADAAAAEPP/xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/ED//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/ED//xAAUEAEAAAAAAAAAAAAAAAAAAAAQ/9oACAEBAAE/EH//2Q=='
   }
 
-  const cloudName = getCloudName()
-  if (!cloudName) return ''
-
   return `https://res.cloudinary.com/${cloudName}/image/upload/w_10,q_auto:low,f_auto,e_blur:1000/${publicId}`
 }
 
-// Export configured cloudinary instance for server-side operations
-export { cloudinary }
+// Get cloud name helper
+export function getCloudName(): string {
+  return cloudName
+}
+
+// NOTE: For server-side operations only (Node.js environment)
+// Import this dynamically or use only in API routes
+export async function getCloudinaryServer() {
+  if (typeof window !== 'undefined') {
+    throw new Error('Cloudinary server SDK can only be used server-side')
+  }
+  
+  const { v2: cloudinary } = await import('cloudinary')
+  
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: process.env.CLOUDINARY_API_KEY || '',
+    api_secret: process.env.CLOUDINARY_API_SECRET || '',
+    secure: true
+  })
+  
+  return cloudinary
+}
