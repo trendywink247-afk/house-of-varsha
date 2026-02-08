@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 14% 97%;
+    --foreground: 0 0% 17%;
+    --card: 40 14% 97%;
+    --card-foreground: 0 0% 17%;
+    --popover: 40 14% 97%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 0 0% 17%;
+    --primary-foreground: 40 14% 97%;
+    --secondary: 30 10% 92%;
+    --secondary-foreground: 0 0% 17%;
+    --muted: 30 10% 92%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 42 35% 59%;
+    --accent-foreground: 0 0% 17%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 8% 88%;
+    --input: 30 8% 88%;
+    --ring: 42 35% 59%;
+    --radius: 0.25rem;
+    --sidebar-background: 40 14% 97%;
+    --sidebar-foreground: 0 0% 17%;
+    --sidebar-primary: 0 0% 17%;
+    --sidebar-primary-foreground: 40 14% 97%;
+    --sidebar-accent: 30 10% 92%;
+    --sidebar-accent-foreground: 0 0% 17%;
+    --sidebar-border: 30 8% 88%;
+    --sidebar-ring: 42 35% 59%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-cream text-charcoal font-sans antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .editorial-title {
+    @apply font-display font-light uppercase tracking-[0.12em] leading-[1];
+    font-size: clamp(36px, 4vw, 64px);
+  }
+  
+  .section-title {
+    @apply font-display font-light uppercase tracking-[0.1em] leading-[1.1];
+    font-size: clamp(28px, 3.2vw, 48px);
+  }
+  
+  .micro-label {
+    @apply font-sans font-medium uppercase text-[10px] tracking-[0.18em];
+  }
+  
+  .body-text {
+    @apply font-sans font-normal leading-relaxed;
+    font-size: clamp(13px, 1vw, 15px);
+  }
+  
+  .cta-link {
+    @apply relative inline-flex items-center gap-2 font-sans font-medium text-xs uppercase tracking-[0.15em] transition-all duration-300;
+  }
+  
+  .cta-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-[1px] bg-gold transition-all duration-300;
+  }
+  
+  .cta-link:hover::after {
+    @apply w-full;
+  }
+  
+  .hairline {
+    @apply w-full h-px bg-charcoal/15;
+  }
+  
+  .btn-primary {
+    @apply px-8 py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300;
+  }
+  
+  .btn-outline {
+    @apply px-8 py-3 border border-charcoal/30 text-charcoal font-sans font-medium uppercase tracking-[0.12em] text-xs hover:border-charcoal hover:bg-charcoal hover:text-cream transition-all duration-300;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar - minimal */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(44, 44, 44, 0.15);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(44, 44, 44, 0.25);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(201, 169, 98, 0.25);
+  color: #2C2C2C;
+}
