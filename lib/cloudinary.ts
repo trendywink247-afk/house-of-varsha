@@ -1,5 +1,5 @@
 // Cloudinary Integration for House of Varsha
-// Provides utilities for image URLs and transformations
+// Client-side only URL generation utilities
 
 // Cloud name from environment
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dv6de0ucq'
@@ -29,17 +29,6 @@ interface TransformOptions {
 
 /**
  * Generate a Cloudinary URL for an image
- *
- * @param publicId - The Cloudinary public ID (e.g., 'products/kurti-1')
- * @param options - Transformation options or preset name
- * @returns Full Cloudinary URL
- *
- * @example
- * // Using a preset
- * getCloudinaryUrl('products/kurti-1', 'card')
- *
- * // Using custom options
- * getCloudinaryUrl('products/kurti-1', { width: 500, height: 600, crop: 'fill' })
  */
 export function getCloudinaryUrl(
   publicId: string,
@@ -47,7 +36,7 @@ export function getCloudinaryUrl(
 ): string {
   if (!cloudName) {
     console.warn('Cloudinary cloud name not configured')
-    return publicId // Return as-is if not configured
+    return publicId
   }
 
   // If publicId is already a full URL, return it
@@ -80,27 +69,7 @@ export function getCloudinaryUrl(
 }
 
 /**
- * Generate responsive image srcSet for Cloudinary images
- * Useful for Next.js Image component or native img srcset
- *
- * @param publicId - The Cloudinary public ID
- * @param widths - Array of widths to generate
- * @returns srcSet string
- */
-export function getCloudinarySrcSet(
-  publicId: string,
-  widths: number[] = [400, 600, 800, 1200]
-): string {
-  if (!cloudName || publicId.startsWith('http')) return ''
-
-  return widths
-    .map(w => `${getCloudinaryUrl(publicId, { width: w, quality: 'auto' })} ${w}w`)
-    .join(', ')
-}
-
-/**
  * Get optimized image URL with automatic format and quality
- * Simpler version for common use cases
  */
 export function getOptimizedImageUrl(publicId: string, width?: number): string {
   if (!publicId) return ''
@@ -120,26 +89,7 @@ export function getOptimizedImageUrl(publicId: string, width?: number): string {
 }
 
 /**
- * Parse a Cloudinary URL to extract the public ID
- */
-export function parseCloudinaryUrl(url: string): string | null {
-  if (!cloudName || !url.includes('cloudinary.com')) return null
-
-  // Match pattern: /upload/[transforms/]publicId
-  const match = url.match(/\/upload\/(?:[^/]+\/)*(.+)$/)
-  return match ? match[1] : null
-}
-
-/**
- * Check if an image ID is a Cloudinary public ID or a full URL
- */
-export function isCloudinaryId(value: string): boolean {
-  return Boolean(value) && !value.startsWith('http://') && !value.startsWith('https://')
-}
-
-/**
  * Get placeholder blur data URL for loading states
- * Uses a tiny, blurred version of the image
  */
 export function getBlurDataUrl(publicId: string): string {
   if (!publicId || publicId.startsWith('http')) {
@@ -149,26 +99,9 @@ export function getBlurDataUrl(publicId: string): string {
   return `https://res.cloudinary.com/${cloudName}/image/upload/w_10,q_auto:low,f_auto,e_blur:1000/${publicId}`
 }
 
-// Get cloud name helper
+/**
+ * Get cloud name
+ */
 export function getCloudName(): string {
   return cloudName
-}
-
-// NOTE: For server-side operations only (Node.js environment)
-// Import this dynamically or use only in API routes
-export async function getCloudinaryServer() {
-  if (typeof window !== 'undefined') {
-    throw new Error('Cloudinary server SDK can only be used server-side')
-  }
-  
-  const { v2: cloudinary } = await import('cloudinary')
-  
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: process.env.CLOUDINARY_API_KEY || '',
-    api_secret: process.env.CLOUDINARY_API_SECRET || '',
-    secure: true
-  })
-  
-  return cloudinary
 }
