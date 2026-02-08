@@ -30,9 +30,11 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-5">
             <Link href="/" className="inline-block mb-6">
-              <span className="font-display text-2xl text-soft-black">
-                {defaultSettings.storeName}
-              </span>
+              <img 
+                src="/logo.jpg" 
+                alt={defaultSettings.storeName}
+                className="h-16 w-auto object-contain"
+              />
             </Link>
             <p className="text-muted-gray text-body-sm leading-relaxed max-w-sm mb-8">
               Celebrating the art of Indian craftsmanship. Each piece tells a story 
