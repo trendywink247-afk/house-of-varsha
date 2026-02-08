@@ -180,20 +180,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Crafted by GeekSpace */}
-          <div className="pt-2 text-center">
-            <p className="text-xs text-charcoal/40 tracking-wider">
-              Crafted with care by{' '}
-              <a
-                href="https://geekspace.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gold transition-colors"
-              >
-                GeekSpace
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </footer>
