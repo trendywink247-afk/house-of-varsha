@@ -1,6 +1,11 @@
 /**
  * Production Server for House of Varsha
  * Express server to serve Vite built files + Google Sheets API proxy
+ *
+ * Works with:
+ * - Hostinger managed Node.js hosting (hPanel auto-deploy)
+ * - Any Node.js hosting (Render, Railway, etc.)
+ * - Direct `node server.js` on a VPS
  */
 
 import express from 'express';
@@ -153,20 +158,16 @@ app.post('/api/products/revalidate', (req, res) => {
 
 // ─── Serve static files from dist folder ────────────────────
 
-app.use(express.static(path.join(__dirname, 'dist'), {
+// Hashed assets (JS/CSS) get long-term caching
+app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets'), {
   maxAge: '1y',
   immutable: true,
-  index: false, // Don't serve index.html for directory requests via static
 }));
 
-// Serve index.html without cache headers
+// All other static files (images, favicon, etc.)
 app.use(express.static(path.join(__dirname, 'dist'), {
-  maxAge: 0,
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('index.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    }
-  },
+  maxAge: '1d',
+  index: false,
 }));
 
 // ─── Health check endpoint ──────────────────────────────────

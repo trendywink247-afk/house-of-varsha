@@ -103,107 +103,46 @@ GOOGLE_SHEET_RANGE=Sheet1
 
 ---
 
-## Production Deployment (Hostinger)
+## Production Deployment (Hostinger Managed Node.js)
 
-### Option 1: Docker (Recommended)
+Hostinger Website Hosting with managed Node.js — no Docker, PM2, or NGINX needed.
 
-Hostinger VPS with Docker Manager:
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full step-by-step guide.
 
-```bash
-# 1. SSH into your VPS
-ssh root@your-vps-ip
+### Quick Setup
 
-# 2. Clone the repo
-git clone https://github.com/trendywink247-afk/house-of-varsha.git
-cd house-of-varsha
+1. hPanel -> **Advanced** -> **Node.js** -> Create Application
+   - Startup file: `server.js`
+   - Node.js version: 20.x
+2. Upload code via Git or File Manager
+3. Click **Run NPM Install** (auto-builds via `postinstall`)
+4. Click **Restart**
+5. Visit your domain
 
-# 3. Create .env file with your config
-cp .env.example .env
-# Edit .env with your values (nano .env)
+### Key Files for Hostinger
 
-# 4. Build and run with Docker
-docker compose up -d --build
-
-# 5. Verify
-curl http://localhost:3000/health
-# Should return: {"status":"ok","timestamp":"...","sheetsConfigured":false}
-```
-
-The container:
-- Runs on port 3000 (map to 80/443 via NGINX or Hostinger's proxy)
-- Uses a multi-stage build (small final image ~180MB)
-- Runs as non-root user
-- Auto-restarts on failure
-- Has a health check endpoint
-
-### Option 2: PM2 (No Docker)
-
-```bash
-# 1. Install Node.js 20
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt-get install -y nodejs
-
-# 2. Install PM2
-npm install -g pm2
-
-# 3. Clone and build
-git clone https://github.com/trendywink247-afk/house-of-varsha.git
-cd house-of-varsha
-npm ci
-npm run build
-
-# 4. Create logs directory
-mkdir -p logs
-
-# 5. Start with PM2
-pm2 start ecosystem.config.cjs
-pm2 save
-pm2 startup  # Auto-start on reboot
-```
-
-### NGINX Reverse Proxy (Both Options)
-
-```bash
-# Copy config
-cp nginx.conf /etc/nginx/sites-available/house-of-varsha
-# Edit: replace your-domain.com with actual domain
-ln -s /etc/nginx/sites-available/house-of-varsha /etc/nginx/sites-enabled/
-nginx -t && systemctl reload nginx
-```
-
-### SSL Certificate
-
-```bash
-apt install certbot python3-certbot-nginx
-certbot --nginx -d your-domain.com -d www.your-domain.com
-```
+| File | Purpose |
+|------|---------|
+| `server.js` | Express server (startup file for hPanel) |
+| `.npmrc` | Ensures devDependencies install for build |
+| `.htaccess` | Apache proxy rules |
+| `postinstall` script | Auto-runs `npm run build` after install |
 
 ### Common Pitfalls
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Port already in use | Another process on port 3000 | `lsof -i :3000` then kill it, or change `PORT` in `.env` |
-| "localhost refused to connect" in dev | Vite runs on port 5173, not 3000 | Use `npm run dev` (port 5173) for development |
-| Build fails with OOM | Low memory VPS | Add swap: `fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile` |
-| Images not loading | Cloudinary URLs hardcoded | Images are on Cloudinary CDN, no config needed |
-| Docker build slow | No layer caching | Use `docker compose build` (caches npm install layer) |
-| Sheets data not updating | Server cache | POST to `/api/products/revalidate` or restart container |
+| Issue | Fix |
+|-------|-----|
+| Application Error | Verify `server.js` is set as startup file in hPanel |
+| "localhost refused to connect" in dev | Use `npm run dev` (port 5173), not `npm start` |
+| Build fails on Hostinger | Build locally, upload `dist/` folder |
+| Sheets not updating | `POST /api/products/revalidate` |
+| Routes show 404 | Ensure `.htaccess` is in app root |
 
-### Updating the Site
+### Updating
 
-```bash
-# Docker
-cd house-of-varsha
-git pull
-docker compose up -d --build
-
-# PM2
-cd house-of-varsha
-git pull
-npm ci
-npm run build
-pm2 restart house-of-varsha
-```
+1. Push to GitHub
+2. hPanel -> Git -> Pull
+3. hPanel -> Node.js -> Run NPM Install -> Restart
 
 ---
 

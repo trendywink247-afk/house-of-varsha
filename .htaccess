@@ -1,0 +1,9 @@
+# Hostinger managed Node.js hosting
+# This file tells Apache/LiteSpeed to proxy all requests to the Node.js app
+
+DirectoryIndex disabled
+
+RewriteEngine On
+
+# Forward all requests to the Node.js application
+RewriteRule ^(.*)$ http://localhost:%{ENV:PORT}/$1 [P,L]
