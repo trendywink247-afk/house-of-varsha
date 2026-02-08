@@ -1,0 +1,188 @@
+[
+  {
+    "productId": "p001",
+    "name": "Kalamkari Kurti - Yellow Family",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p001-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548612/house-of-varsha/products/p001-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p001-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548614/house-of-varsha/products/p001-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p001-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548616/house-of-varsha/products/p001-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p001-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548618/house-of-varsha/products/p001-gallery-2.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-3",
+        "publicId": "house-of-varsha/products/p001-gallery-3",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548621/house-of-varsha/products/p001-gallery-3.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-4",
+        "publicId": "house-of-varsha/products/p001-gallery-4",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548622/house-of-varsha/products/p001-gallery-4.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p002",
+    "name": "Kalamkari Kurti - Rust Orange",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p002-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548627/house-of-varsha/products/p002-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p002-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548628/house-of-varsha/products/p002-hover.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p003",
+    "name": "3pc Kurti Set - Lemon Yellow",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p003-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548634/house-of-varsha/products/p003-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p003-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548635/house-of-varsha/products/p003-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p003-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548638/house-of-varsha/products/p003-gallery-1.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p004",
+    "name": "3pc Kurti Set - Lemon Yellow",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p004-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548642/house-of-varsha/products/p004-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p004-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548644/house-of-varsha/products/p004-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p004-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548645/house-of-varsha/products/p004-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p004-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548647/house-of-varsha/products/p004-gallery-2.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p005",
+    "name": "3pc Kurti Set - Sea Blue & Gold",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p005-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548651/house-of-varsha/products/p005-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p005-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548652/house-of-varsha/products/p005-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p005-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548655/house-of-varsha/products/p005-gallery-1.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p006",
+    "name": "3pc Kurti Set - Green",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p006-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548660/house-of-varsha/products/p006-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p006-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548661/house-of-varsha/products/p006-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p006-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548663/house-of-varsha/products/p006-gallery-1.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "productId": "p007",
+    "name": "3pc Kurti Set - Grey",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p007-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548667/house-of-varsha/products/p007-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p007-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548668/house-of-varsha/products/p007-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p007-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548670/house-of-varsha/products/p007-gallery-1.jpg",
+        "success": true
+      }
+    ]
+  }
+]

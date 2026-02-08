@@ -1,7 +1,7 @@
-import type { Product } from '@/types';
+import type { Product } from '@/types/index';
 
-// All products preserved from original repository
 // House of Varsha - Women's Indian Ethnic Wear
+// Updated with new product images - 7 Products (Feb 2026)
 
 export const products: Product[] = [
   {
@@ -15,15 +15,15 @@ export const products: Product[] = [
     code: 'K001',
     featured: true,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485957/house-of-varsha/products/p001-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485958/house-of-varsha/products/p001-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548612/house-of-varsha/products/p001-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548614/house-of-varsha/products/p001-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485957/house-of-varsha/products/p001-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485958/house-of-varsha/products/p001-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485960/house-of-varsha/products/p001-gallery-1.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485961/house-of-varsha/products/p001-gallery-2.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485963/house-of-varsha/products/p001-gallery-3.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485964/house-of-varsha/products/p001-gallery-4.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548612/house-of-varsha/products/p001-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548614/house-of-varsha/products/p001-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548616/house-of-varsha/products/p001-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548618/house-of-varsha/products/p001-gallery-2.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548621/house-of-varsha/products/p001-gallery-3.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548622/house-of-varsha/products/p001-gallery-4.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p001-main',
@@ -52,11 +52,11 @@ export const products: Product[] = [
     code: 'K002',
     featured: true,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485827/house-of-varsha/products/p002-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485829/house-of-varsha/products/p002-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548627/house-of-varsha/products/p002-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548628/house-of-varsha/products/p002-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485827/house-of-varsha/products/p002-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485829/house-of-varsha/products/p002-hover.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548627/house-of-varsha/products/p002-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548628/house-of-varsha/products/p002-hover.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p002-main',
@@ -72,21 +72,21 @@ export const products: Product[] = [
   },
   {
     id: 'p003',
-    name: '3pc Kurti Set - Lemon Yellow',
+    name: '3pc Kurti Set - Floral Pink',
     price: '₹699',
-    description: 'Elegant 3-piece Kurti set in refreshing lemon yellow shade. Comfortable cotton fabric perfect for daily wear and special occasions.',
+    description: 'Elegant 3-piece Kurti set in beautiful floral pink shade. Comfortable cotton fabric perfect for daily wear and special occasions.',
     category: 'Kurti Set',
     sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Lemon Yellow',
+    color: 'Floral Pink',
     code: 'V001',
     featured: false,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485830/house-of-varsha/products/p003-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485832/house-of-varsha/products/p003-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548634/house-of-varsha/products/p003-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548635/house-of-varsha/products/p003-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485830/house-of-varsha/products/p003-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485832/house-of-varsha/products/p003-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485833/house-of-varsha/products/p003-gallery-1.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548634/house-of-varsha/products/p003-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548635/house-of-varsha/products/p003-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548638/house-of-varsha/products/p003-gallery-1.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p003-main',
@@ -96,29 +96,29 @@ export const products: Product[] = [
     details: [
       'Complete 3-piece set',
       'Cotton fabric',
-      'Lemon Yellow color',
+      'Floral Pink color',
       'Available in sizes M, L, XL, XXL',
       'Comfortable for daily wear'
     ]
   },
   {
     id: 'p004',
-    name: '3pc Kurti Set - Lemon Yellow',
+    name: '3pc Kurti Set - Sea Blue',
     price: '₹699',
-    description: 'Stylish 3-piece Kurti set in beautiful lemon yellow. Made with soft cotton fabric for all-day comfort and elegance.',
+    description: 'Stylish 3-piece Kurti set in beautiful sea blue. Made with soft cotton fabric for all-day comfort and elegance.',
     category: 'Kurti Set',
     sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Lemon Yellow',
+    color: 'Sea Blue',
     code: 'V002',
     featured: true,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485835/house-of-varsha/products/p004-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485836/house-of-varsha/products/p004-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548642/house-of-varsha/products/p004-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548644/house-of-varsha/products/p004-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485835/house-of-varsha/products/p004-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485836/house-of-varsha/products/p004-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485837/house-of-varsha/products/p004-gallery-1.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485839/house-of-varsha/products/p004-gallery-2.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548642/house-of-varsha/products/p004-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548644/house-of-varsha/products/p004-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548645/house-of-varsha/products/p004-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548647/house-of-varsha/products/p004-gallery-2.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p004-main',
@@ -129,28 +129,28 @@ export const products: Product[] = [
     details: [
       'Complete 3-piece set',
       'Cotton fabric',
-      'Lemon Yellow color',
+      'Sea Blue color',
       'Available in sizes M, L, XL, XXL',
       'Elegant and comfortable'
     ]
   },
   {
     id: 'p005',
-    name: '3pc Kurti Set - Sea Blue & Gold',
+    name: '3pc Kurti Set - Green',
     price: '₹699',
-    description: 'Gorgeous 3-piece Kurti set featuring sea blue and gold color combination. Premium cotton fabric with elegant design.',
+    description: 'Gorgeous 3-piece Kurti set in vibrant green color. Premium cotton fabric with elegant design.',
     category: 'Kurti Set',
     sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Sea Blue and Gold',
+    color: 'Green',
     code: 'V003',
     featured: false,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485840/house-of-varsha/products/p005-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485841/house-of-varsha/products/p005-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548651/house-of-varsha/products/p005-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548652/house-of-varsha/products/p005-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485840/house-of-varsha/products/p005-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485841/house-of-varsha/products/p005-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485843/house-of-varsha/products/p005-gallery-1.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548651/house-of-varsha/products/p005-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548652/house-of-varsha/products/p005-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548655/house-of-varsha/products/p005-gallery-1.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p005-main',
@@ -160,28 +160,28 @@ export const products: Product[] = [
     details: [
       'Complete 3-piece set',
       'Cotton fabric',
-      'Sea Blue and Gold combination',
+      'Vibrant Green color',
       'Available in sizes M, L, XL, XXL',
       'Perfect for special occasions'
     ]
   },
   {
     id: 'p006',
-    name: '3pc Kurti Set - Green',
+    name: '3pc Kurti Set - Lemon Yellow',
     price: '₹699',
-    description: 'Beautiful 3-piece Kurti set in vibrant green color. Crafted from soft cotton fabric for ultimate comfort and style.',
+    description: 'Beautiful 3-piece Kurti set in refreshing lemon yellow color. Crafted from soft cotton fabric for ultimate comfort and style.',
     category: 'Kurti Set',
     sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Green',
+    color: 'Lemon Yellow',
     code: 'V004',
     featured: false,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485845/house-of-varsha/products/p006-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485846/house-of-varsha/products/p006-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548660/house-of-varsha/products/p006-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548661/house-of-varsha/products/p006-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485845/house-of-varsha/products/p006-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485846/house-of-varsha/products/p006-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485848/house-of-varsha/products/p006-gallery-1.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548660/house-of-varsha/products/p006-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548661/house-of-varsha/products/p006-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548663/house-of-varsha/products/p006-gallery-1.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p006-main',
@@ -191,7 +191,7 @@ export const products: Product[] = [
     details: [
       'Complete 3-piece set',
       'Cotton fabric',
-      'Vibrant Green color',
+      'Lemon Yellow color',
       'Available in sizes M, L, XL, XXL',
       'Traditional ethnic design'
     ]
@@ -207,12 +207,12 @@ export const products: Product[] = [
     code: 'V005',
     featured: true,
     inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485849/house-of-varsha/products/p007-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485850/house-of-varsha/products/p007-hover.jpg',
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548667/house-of-varsha/products/p007-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548668/house-of-varsha/products/p007-hover.jpg',
     images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485849/house-of-varsha/products/p007-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485850/house-of-varsha/products/p007-hover.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485852/house-of-varsha/products/p007-gallery-1.jpg'
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548667/house-of-varsha/products/p007-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548668/house-of-varsha/products/p007-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770548670/house-of-varsha/products/p007-gallery-1.jpg'
     ],
     cloudinaryIds: [
       'house-of-varsha/products/p007-main',
@@ -226,101 +226,13 @@ export const products: Product[] = [
       'Available in sizes M, L, XL, XXL',
       'Sophisticated design'
     ]
-  },
-  {
-    id: 'p008',
-    name: 'Anarkali - Royal Blue',
-    price: '₹1,299',
-    description: 'Stunning Anarkali suit in royal blue color. Features intricate embroidery and flowing silhouette for a regal look.',
-    category: 'Anarkali',
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Royal Blue',
-    code: 'A001',
-    featured: false,
-    inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485853/house-of-varsha/products/p008-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485854/house-of-varsha/products/p008-hover.jpg',
-    images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485853/house-of-varsha/products/p008-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485854/house-of-varsha/products/p008-hover.jpg'
-    ],
-    cloudinaryIds: [
-      'house-of-varsha/products/p008-main',
-      'house-of-varsha/products/p008-hover'
-    ],
-    details: [
-      'Premium quality fabric',
-      'Intricate embroidery work',
-      'Royal Blue color',
-      'Available in sizes M, L, XL, XXL',
-      'Perfect for weddings and parties'
-    ]
-  },
-  {
-    id: 'p009',
-    name: 'Anarkali - Mint Green',
-    price: '₹1,199',
-    description: 'Elegant Anarkali suit in refreshing mint green. Features delicate embellishments and comfortable fit.',
-    category: 'Anarkali',
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Mint Green',
-    code: 'A002',
-    featured: false,
-    inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485855/house-of-varsha/products/p009-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485856/house-of-varsha/products/p009-hover.jpg',
-    images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485855/house-of-varsha/products/p009-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485856/house-of-varsha/products/p009-hover.jpg'
-    ],
-    cloudinaryIds: [
-      'house-of-varsha/products/p009-main',
-      'house-of-varsha/products/p009-hover'
-    ],
-    details: [
-      'Premium quality fabric',
-      'Delicate embellishments',
-      'Mint Green color',
-      'Available in sizes M, L, XL, XXL',
-      'Elegant and comfortable'
-    ]
-  },
-  {
-    id: 'p010',
-    name: 'Kurti - Peach Blossom',
-    price: '₹849',
-    description: 'Beautiful peach colored Kurti with floral embroidery. Perfect for casual outings and office wear.',
-    category: 'Kurti',
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    color: 'Peach',
-    code: 'K003',
-    featured: false,
-    inStock: true,
-    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485857/house-of-varsha/products/p010-main.jpg',
-    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485858/house-of-varsha/products/p010-hover.jpg',
-    images: [
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485857/house-of-varsha/products/p010-main.jpg',
-      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1770485858/house-of-varsha/products/p010-hover.jpg'
-    ],
-    cloudinaryIds: [
-      'house-of-varsha/products/p010-main',
-      'house-of-varsha/products/p010-hover'
-    ],
-    details: [
-      'Soft cotton fabric',
-      'Floral embroidery',
-      'Peach color',
-      'Available in sizes M, L, XL, XXL',
-      'Perfect for daily wear'
-    ]
   }
 ];
 
 export const categories = [
   { id: 'all', name: 'All Products', slug: 'all' },
   { id: 'kurti', name: 'Kurtis', slug: 'kurtis' },
-  { id: 'kurti-set', name: 'Kurti Sets', slug: 'kurti-sets' },
-  { id: 'anarkali', name: 'Anarkali', slug: 'anarkali' }
+  { id: 'kurti-set', name: 'Kurti Sets', slug: 'kurti-sets' }
 ];
 
 export const getFeaturedProducts = () => products.filter(p => p.featured);
