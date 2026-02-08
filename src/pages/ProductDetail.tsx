@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, Check, ShoppingBag, Heart, ChevronRight } from 'lucide-react';
-import { getProductById, products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { Footer } from '@/sections/Footer';
 
@@ -11,7 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const product = getProductById(id || '');
+  const { products } = useProducts();
+  const product = products.find(p => p.id === id);
   const { addToCart } = useCart();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -313,13 +314,17 @@ export function ProductDetail() {
                     <img
                       src={relatedProduct.image}
                       alt={relatedProduct.name}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <img
-                      src={relatedProduct.hoverImage}
-                      alt={`${relatedProduct.name} - alternate view`}
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    />
+                    {relatedProduct.hoverImage && (
+                      <img
+                        src={relatedProduct.hoverImage}
+                        alt={`${relatedProduct.name} - alternate view`}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      />
+                    )}
                   </div>
                   <span className="micro-label text-text-secondary/70">
                     {relatedProduct.category}

@@ -1,17 +1,12 @@
 # Dependencies
 /node_modules
-/.pnp
-.pnp.js
 
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-
-# Production
+# Build output
+/dist
 /build
+
+# Logs
+/logs
 
 # Misc
 .DS_Store
@@ -20,18 +15,14 @@
 # Debug
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 
-# Local env files (NEVER commit these)
-.env*.local
+# Environment (NEVER commit secrets)
+.env
 .env.local
-
-# Vercel
-.vercel
+.env*.local
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
 
 # IDE
 .vscode/
@@ -39,6 +30,6 @@ next-env.d.ts
 *.swp
 *.swo
 
-# Temporary files
+# Temporary
 *.tmp
 *.temp
