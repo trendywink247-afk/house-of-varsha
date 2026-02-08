@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,32 @@ import { Link } from 'react-router-dom';
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeFromCart, totalPrice } = useCart();
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  // Generate WhatsApp message with cart items
+  const whatsappUrl = useMemo(() => {
+    if (items.length === 0) return '';
+
+    const phoneNumber = '917569619390';
+    
+    let message = 'Hello! I would like to place an order from House of Varsha.\n\n';
+    message += '*Order Details:*\n\n';
+    
+    items.forEach((item, index) => {
+      const itemTotal = parseInt(item.product.price.replace(/[₹,]/g, '')) * item.quantity;
+      message += `${index + 1}. ${item.product.name}\n`;
+      message += `   Size: ${item.size}\n`;
+      message += `   Quantity: ${item.quantity}\n`;
+      message += `   Price: ${item.product.price} each\n`;
+      message += `   Subtotal: ₹${itemTotal.toLocaleString()}\n\n`;
+    });
+    
+    message += `*Total Amount: ₹${totalPrice.toLocaleString()}*\n\n`;
+    message += 'Please confirm availability. Thank you!';
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+    return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  }, [items, totalPrice]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -167,7 +193,7 @@ export function CartDrawer() {
                 Shipping and taxes calculated at checkout.
               </p>
               <a
-                href="https://wa.me/917569619390?text=Hello! I'm interested in placing an order from House of Varsha."
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300 flex items-center justify-center"
