@@ -1,21 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Filter, X } from 'lucide-react';
-import { products, categories } from '@/data/products';
+import { categories } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get('category') || 'all'
+  const selectedCategory = useMemo(
+    () => searchParams.get('category') || 'all',
+    [searchParams]
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+
+  const { products, isLoading } = useProducts();
 
   const filteredProducts =
     selectedCategory === 'all'
@@ -23,11 +27,6 @@ export function Shop() {
       : products.filter(
           (p) => p.category.toLowerCase().replace(' ', '-') === selectedCategory
         );
-
-  useEffect(() => {
-    const category = searchParams.get('category') || 'all';
-    setSelectedCategory(category);
-  }, [searchParams]);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -75,7 +74,6 @@ export function Shop() {
   }, [filteredProducts]);
 
   const handleCategoryChange = (slug: string) => {
-    setSelectedCategory(slug);
     if (slug === 'all') {
       setSearchParams({});
     } else {
@@ -124,6 +122,7 @@ export function Shop() {
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-charcoal/15 text-charcoal w-fit"
+            aria-label="Toggle category filters"
           >
             <Filter className="w-3.5 h-3.5" strokeWidth={1.5} />
             <span className="micro-label">Filter</span>
@@ -131,7 +130,7 @@ export function Shop() {
 
           {/* Results Count */}
           <span className="micro-label text-text-secondary/70">
-            {filteredProducts.length} Products
+            {isLoading ? 'Loading...' : `${filteredProducts.length} Products`}
           </span>
         </div>
 
@@ -143,6 +142,7 @@ export function Shop() {
               <button
                 onClick={() => setIsFilterOpen(false)}
                 className="p-1 text-charcoal"
+                aria-label="Close filters"
               >
                 <X className="w-4 h-4" strokeWidth={1.5} />
               </button>
@@ -181,14 +181,18 @@ export function Shop() {
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Hover Image */}
-                <img
-                  src={product.hoverImage}
-                  alt={`${product.name} - alternate view`}
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                />
+                {product.hoverImage && (
+                  <img
+                    src={product.hoverImage}
+                    alt={`${product.name} - alternate view`}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  />
+                )}
                 {/* Badge */}
                 {product.featured && (
                   <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
@@ -216,7 +220,7 @@ export function Shop() {
         </div>
 
         {/* Empty State */}
-        {filteredProducts.length === 0 && (
+        {filteredProducts.length === 0 && !isLoading && (
           <div className="text-center py-16">
             <p className="font-display text-xl text-charcoal mb-3">
               No products found

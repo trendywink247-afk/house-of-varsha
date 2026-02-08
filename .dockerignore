@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+logs
+.git
+.env
+.env.local
+.env*.local
+*.md
+.vscode
+.idea
+scripts/upload-results.json

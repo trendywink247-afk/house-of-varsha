@@ -108,6 +108,28 @@
   }
 }
 
+/* Focus-visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #C9B18A;
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #2C2C2C;
+  color: #FAFAF8;
+  font-size: 0.875rem;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
 /* Custom scrollbar - minimal */
 ::-webkit-scrollbar {
   width: 4px;

@@ -68,6 +68,10 @@ function App() {
       <HashRouter>
         <ScrollToTop />
         <div className="relative min-h-screen bg-cream">
+          <a href="#main-content" className="skip-link">
+            Skip to content
+          </a>
+
           {/* Header */}
           <Header />
 
@@ -75,6 +79,7 @@ function App() {
           <CartDrawer />
 
           {/* Routes */}
+          <div id="main-content">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/shop" element={<Shop />} />
@@ -83,6 +88,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/collections" element={<Shop />} />
           </Routes>
+          </div>
         </div>
       </HashRouter>
     </CartProvider>

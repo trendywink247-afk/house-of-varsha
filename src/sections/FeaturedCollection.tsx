@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getFeaturedProducts } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,7 +12,8 @@ export function FeaturedCollection() {
   const headerRef = useRef<HTMLDivElement>(null);
   const productsRef = useRef<HTMLDivElement>(null);
 
-  const featuredProducts = getFeaturedProducts().slice(0, 4);
+  const { products } = useProducts();
+  const featuredProducts = products.filter(p => p.featured).slice(0, 4);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -106,14 +107,18 @@ export function FeaturedCollection() {
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Hover Image */}
-                <img
-                  src={product.hoverImage}
-                  alt={`${product.name} - alternate view`}
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                />
+                {product.hoverImage && (
+                  <img
+                    src={product.hoverImage}
+                    alt={`${product.name} - alternate view`}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  />
+                )}
                 {/* Badge */}
                 {product.featured && (
                   <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
