@@ -6,6 +6,7 @@ import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ArrowDown } from 'lucide-react';
 import { products } from '@/data/products';
 import { defaultSettings, getWhatsAppLink } from '@/lib/utils';
+import { getOptimizedImageUrl } from '@/lib/cloudinary';
 import ProductCard, { ProductGrid } from '@/components/ProductCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -201,7 +202,7 @@ export default function Home() {
                 className="absolute inset-0"
               >
                 <img
-                  src="/images/story-craftsmanship.jpg"
+                  src={getOptimizedImageUrl('editorial/story-craftsmanship', 1200)}
                   alt="Craftsmanship"
                   className="w-full h-full object-cover"
                 />

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { getOptimizedImageUrl } from '@/lib/cloudinary'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -83,7 +84,7 @@ export default function About() {
             {/* Image Side */}
             <div className="relative aspect-square lg:aspect-auto min-h-[400px] lg:min-h-[600px] order-1 lg:order-2">
               <img
-                src="/images/story-philosophy.jpg"
+                src={getOptimizedImageUrl('editorial/story-philosophy', 1200)}
                 alt="Our Philosophy"
                 className="w-full h-full object-cover"
               />

@@ -23,6 +23,7 @@
     "autoprefixer": "^10.4.16",
     "cloudinary": "^1.40.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.4",
     "eslint": "^8.53.0",
     "eslint-config-next": "14.0.3",
     "framer-motion": "^12.33.0",
