@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Filter, X } from 'lucide-react';
 import { products, categories } from '@/data/products';
+import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -236,6 +237,7 @@ export function Shop() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

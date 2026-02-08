@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, Check, ShoppingBag, Heart, ChevronRight } from 'lucide-react';
 import { getProductById, products } from '@/data/products';
 import { useCart } from '@/hooks/useCart';
+import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -333,6 +334,7 @@ export function ProductDetail() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

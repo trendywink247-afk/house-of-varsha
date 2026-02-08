@@ -64,7 +64,7 @@ export function Footer() {
   return (
     <footer
       ref={sectionRef}
-      className="relative w-full py-16 lg:py-20 bg-cream border-t border-charcoal/10"
+      className="relative w-full py-12 lg:py-16 bg-cream border-t border-charcoal/10"
     >
       <div className="w-full px-6 lg:px-12">
         <div ref={contentRef}>
@@ -181,7 +181,7 @@ export function Footer() {
           </div>
 
           {/* Crafted by GeekSpace */}
-          <div className="pt-4 text-center">
+          <div className="pt-2 text-center">
             <p className="text-xs text-charcoal/40 tracking-wider">
               Crafted with care by{' '}
               <a
