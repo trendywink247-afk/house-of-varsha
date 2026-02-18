@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
-import { Instagram, Mail, ArrowRight } from 'lucide-react';
+import { Instagram, Mail, ArrowRight, Youtube } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -83,13 +83,22 @@ export function Footer() {
               </p>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://instagram.com/houseofvarsha"
+                  href="https://www.instagram.com/houseof_varsha"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 text-charcoal/60 hover:text-gold transition-colors"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-4 h-4" strokeWidth={1.5} />
+                </a>
+                <a
+                  href="https://youtube.com/@houseofvarsha"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-charcoal/60 hover:text-gold transition-colors"
+                  aria-label="YouTube"
+                >
+                  <Youtube className="w-4 h-4" strokeWidth={1.5} />
                 </a>
                 <a
                   href="mailto:hello@houseofvarsha.com"

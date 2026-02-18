@@ -11,7 +11,7 @@ export function CartDrawer() {
   const whatsappUrl = useMemo(() => {
     if (items.length === 0) return '';
 
-    const phoneNumber = '917569619390';
+    const phoneNumber = '917989733041';
     
     let message = 'Hello! I would like to place an order from House of Varsha.\n\n';
     message += '*Order Details:*\n\n';
