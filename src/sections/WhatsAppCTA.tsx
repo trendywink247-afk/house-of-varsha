@@ -57,7 +57,7 @@ export function WhatsAppCTA() {
             recommendations and styling advice.
           </p>
           <a
-            href="https://wa.me/917569619390?text=Hello! I'm interested in House of Varsha products."
+            href="https://wa.me/917989733041?text=Hello! I'm interested in House of Varsha products."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-6 py-3 bg-charcoal text-cream hover:bg-gold transition-colors duration-300"

@@ -105,10 +105,10 @@ export function Contact() {
                   <div>
                     <h3 className="micro-label text-charcoal mb-0.5">Phone</h3>
                     <a
-                      href="tel:+919876543210"
+                      href="tel:+917989733041"
                       className="body-text text-text-secondary hover:text-charcoal transition-colors"
                     >
-                      +91 98765 43210
+                      +91 79897 33041
                     </a>
                   </div>
                 </div>
@@ -120,11 +120,9 @@ export function Contact() {
                   <div>
                     <h3 className="micro-label text-charcoal mb-0.5">Address</h3>
                     <p className="body-text text-text-secondary">
-                      12, Craftsmen Lane
+                      Madhapur Jubilee Hills
                       <br />
-                      Jaipur, Rajasthan 302001
-                      <br />
-                      India
+                      Hyderabad - 500081
                     </p>
                   </div>
                 </div>
@@ -136,7 +134,7 @@ export function Contact() {
                   <div>
                     <h3 className="micro-label text-charcoal mb-0.5">WhatsApp</h3>
                     <a
-                      href="https://wa.me/917569619390?text=Hello! I'm interested in House of Varsha products."
+                      href="https://wa.me/917989733041?text=Hello! I'm interested in House of Varsha products."
                       target="_blank"
                       rel="noopener noreferrer"
                       className="body-text text-text-secondary hover:text-charcoal transition-colors"
