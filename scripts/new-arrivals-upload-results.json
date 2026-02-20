@@ -1,0 +1,201 @@
+[
+  {
+    "folder": "P1",
+    "productId": "p008",
+    "name": "Coordset Set - Yellow",
+    "price": "₹649",
+    "category": "Coordset",
+    "color": "Yellow",
+    "fabric": "Rayon fabric",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p008-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591276/house-of-varsha/products/p008-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p008-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591278/house-of-varsha/products/p008-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p008-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591280/house-of-varsha/products/p008-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p008-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591282/house-of-varsha/products/p008-gallery-2.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-3",
+        "publicId": "house-of-varsha/products/p008-gallery-3",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591286/house-of-varsha/products/p008-gallery-3.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "folder": "P2",
+    "productId": "p009",
+    "name": "Coordset Set - Pink",
+    "price": "₹649",
+    "category": "Coordset",
+    "color": "Pink",
+    "fabric": "Rayon fabric",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p009-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591290/house-of-varsha/products/p009-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p009-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591292/house-of-varsha/products/p009-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p009-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591294/house-of-varsha/products/p009-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p009-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591295/house-of-varsha/products/p009-gallery-2.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-3",
+        "publicId": "house-of-varsha/products/p009-gallery-3",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591297/house-of-varsha/products/p009-gallery-3.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "folder": "P3",
+    "productId": "p010",
+    "name": "Kalamkari Kurtis - Green",
+    "price": "₹995",
+    "category": "Kurti",
+    "color": "Green",
+    "fabric": "Pure cotton fabric - Kalamkari model",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p010-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591300/house-of-varsha/products/p010-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p010-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591301/house-of-varsha/products/p010-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p010-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591303/house-of-varsha/products/p010-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p010-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591305/house-of-varsha/products/p010-gallery-2.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-3",
+        "publicId": "house-of-varsha/products/p010-gallery-3",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591307/house-of-varsha/products/p010-gallery-3.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "folder": "P4",
+    "productId": "p011",
+    "name": "Kalamkari Kurtis - Yellow",
+    "price": "₹995",
+    "category": "Kurti",
+    "color": "Yellow",
+    "fabric": "Pure cotton fabric - Kalamkari model",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p011-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591309/house-of-varsha/products/p011-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p011-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591311/house-of-varsha/products/p011-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p011-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591312/house-of-varsha/products/p011-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p011-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591314/house-of-varsha/products/p011-gallery-2.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-3",
+        "publicId": "house-of-varsha/products/p011-gallery-3",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591317/house-of-varsha/products/p011-gallery-3.jpg",
+        "success": true
+      }
+    ]
+  },
+  {
+    "folder": "P5",
+    "productId": "p012",
+    "name": "Embroidered Cotton Kurtis with Dupatta - Green",
+    "price": "₹995",
+    "category": "Kurti",
+    "color": "Green",
+    "fabric": "Pure cotton fabric",
+    "images": [
+      {
+        "type": "main",
+        "publicId": "house-of-varsha/products/p012-main",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591320/house-of-varsha/products/p012-main.jpg",
+        "success": true
+      },
+      {
+        "type": "hover",
+        "publicId": "house-of-varsha/products/p012-hover",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591322/house-of-varsha/products/p012-hover.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-1",
+        "publicId": "house-of-varsha/products/p012-gallery-1",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591324/house-of-varsha/products/p012-gallery-1.jpg",
+        "success": true
+      },
+      {
+        "type": "gallery-2",
+        "publicId": "house-of-varsha/products/p012-gallery-2",
+        "url": "https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591329/house-of-varsha/products/p012-gallery-2.jpg",
+        "success": true
+      }
+    ]
+  }
+]

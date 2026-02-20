@@ -1,7 +1,7 @@
 import type { Product } from '@/types/index';
 
 // House of Varsha - Women's Indian Ethnic Wear
-// Updated with new product images - 7 Products (Feb 2026)
+// Updated with new arrivals - 12 Products (Feb 2026)
 
 export const products: Product[] = [
   {
@@ -226,13 +226,187 @@ export const products: Product[] = [
       'Available in sizes M, L, XL, XXL',
       'Sophisticated design'
     ]
+  },
+  {
+    id: 'p008',
+    name: 'Coordset Set - Yellow',
+    price: '₹649',
+    description: 'Beautiful Coordset Set in stunning yellow shade. Made with premium rayon fabric for comfort and style.',
+    category: 'Coordset',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Yellow',
+    code: 'P008',
+    featured: false,
+    inStock: true,
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591276/house-of-varsha/products/p008-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591278/house-of-varsha/products/p008-hover.jpg',
+    images: [
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591276/house-of-varsha/products/p008-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591278/house-of-varsha/products/p008-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591280/house-of-varsha/products/p008-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591282/house-of-varsha/products/p008-gallery-2.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591286/house-of-varsha/products/p008-gallery-3.jpg'
+    ],
+    cloudinaryIds: [
+      'house-of-varsha/products/p008-main',
+      'house-of-varsha/products/p008-hover',
+      'house-of-varsha/products/p008-gallery-1',
+      'house-of-varsha/products/p008-gallery-2',
+      'house-of-varsha/products/p008-gallery-3'
+    ],
+    details: [
+      'Rayon fabric',
+      'Yellow color',
+      'Available in sizes M, L, XL, XXL',
+      'Handcrafted with love',
+      'Trendy coordset set'
+    ]
+  },
+  {
+    id: 'p009',
+    name: 'Coordset Set - Pink',
+    price: '₹649',
+    description: 'Beautiful Coordset Set in stunning pink shade. Made with premium rayon fabric for comfort and style.',
+    category: 'Coordset',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Pink',
+    code: 'P009',
+    featured: false,
+    inStock: true,
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591290/house-of-varsha/products/p009-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591292/house-of-varsha/products/p009-hover.jpg',
+    images: [
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591290/house-of-varsha/products/p009-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591292/house-of-varsha/products/p009-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591294/house-of-varsha/products/p009-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591295/house-of-varsha/products/p009-gallery-2.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591297/house-of-varsha/products/p009-gallery-3.jpg'
+    ],
+    cloudinaryIds: [
+      'house-of-varsha/products/p009-main',
+      'house-of-varsha/products/p009-hover',
+      'house-of-varsha/products/p009-gallery-1',
+      'house-of-varsha/products/p009-gallery-2',
+      'house-of-varsha/products/p009-gallery-3'
+    ],
+    details: [
+      'Rayon fabric',
+      'Pink color',
+      'Available in sizes M, L, XL, XXL',
+      'Handcrafted with love',
+      'Trendy coordset set'
+    ]
+  },
+  {
+    id: 'p010',
+    name: 'Kalamkari Kurtis - Green',
+    price: '₹995',
+    description: 'Beautiful handcrafted Kalamkari Kurti in green shade. Traditional Indian block prints on pure cotton fabric - kalamkari model.',
+    category: 'Kurti',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Green',
+    code: 'P010',
+    featured: true,
+    inStock: true,
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591300/house-of-varsha/products/p010-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591301/house-of-varsha/products/p010-hover.jpg',
+    images: [
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591300/house-of-varsha/products/p010-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591301/house-of-varsha/products/p010-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591303/house-of-varsha/products/p010-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591305/house-of-varsha/products/p010-gallery-2.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591307/house-of-varsha/products/p010-gallery-3.jpg'
+    ],
+    cloudinaryIds: [
+      'house-of-varsha/products/p010-main',
+      'house-of-varsha/products/p010-hover',
+      'house-of-varsha/products/p010-gallery-1',
+      'house-of-varsha/products/p010-gallery-2',
+      'house-of-varsha/products/p010-gallery-3'
+    ],
+    details: [
+      'Pure cotton fabric - Kalamkari model',
+      'Green color',
+      'Available in sizes M, L, XL, XXL',
+      'Handcrafted with love',
+      'Perfect for festive occasions'
+    ]
+  },
+  {
+    id: 'p011',
+    name: 'Kalamkari Kurtis - Yellow',
+    price: '₹995',
+    description: 'Beautiful handcrafted Kalamkari Kurti in yellow shade. Traditional Indian block prints on pure cotton fabric - kalamkari model.',
+    category: 'Kurti',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Yellow',
+    code: 'P011',
+    featured: true,
+    inStock: true,
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591309/house-of-varsha/products/p011-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591311/house-of-varsha/products/p011-hover.jpg',
+    images: [
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591309/house-of-varsha/products/p011-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591311/house-of-varsha/products/p011-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591312/house-of-varsha/products/p011-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591314/house-of-varsha/products/p011-gallery-2.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591317/house-of-varsha/products/p011-gallery-3.jpg'
+    ],
+    cloudinaryIds: [
+      'house-of-varsha/products/p011-main',
+      'house-of-varsha/products/p011-hover',
+      'house-of-varsha/products/p011-gallery-1',
+      'house-of-varsha/products/p011-gallery-2',
+      'house-of-varsha/products/p011-gallery-3'
+    ],
+    details: [
+      'Pure cotton fabric - Kalamkari model',
+      'Yellow color',
+      'Available in sizes M, L, XL, XXL',
+      'Handcrafted with love',
+      'Perfect for festive occasions'
+    ]
+  },
+  {
+    id: 'p012',
+    name: 'Embroidered Cotton Kurtis with Dupatta - Green',
+    price: '₹995',
+    description: 'Elegant embroidered cotton kurti with matching dupatta in green shade. Made with pure cotton fabric for ultimate comfort.',
+    category: 'Kurti',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    color: 'Green',
+    code: 'P012',
+    featured: false,
+    inStock: true,
+    image: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591320/house-of-varsha/products/p012-main.jpg',
+    hoverImage: 'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591322/house-of-varsha/products/p012-hover.jpg',
+    images: [
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591320/house-of-varsha/products/p012-main.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591322/house-of-varsha/products/p012-hover.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591324/house-of-varsha/products/p012-gallery-1.jpg',
+      'https://res.cloudinary.com/dv6de0ucq/image/upload/v1771591329/house-of-varsha/products/p012-gallery-2.jpg'
+    ],
+    cloudinaryIds: [
+      'house-of-varsha/products/p012-main',
+      'house-of-varsha/products/p012-hover',
+      'house-of-varsha/products/p012-gallery-1',
+      'house-of-varsha/products/p012-gallery-2'
+    ],
+    details: [
+      'Pure cotton fabric',
+      'Green color',
+      'Available in sizes M, L, XL, XXL',
+      'Handcrafted with love',
+      'Complete set with dupatta'
+    ]
   }
 ];
 
 export const categories = [
   { id: 'all', name: 'All Products', slug: 'all' },
   { id: 'kurti', name: 'Kurtis', slug: 'kurtis' },
-  { id: 'kurti-set', name: 'Kurti Sets', slug: 'kurti-sets' }
+  { id: 'kurti-set', name: 'Kurti Sets', slug: 'kurti-sets' },
+  { id: 'coordset', name: 'Coordsets', slug: 'coordsets' }
 ];
 
 export const getFeaturedProducts = () => products.filter(p => p.featured);
