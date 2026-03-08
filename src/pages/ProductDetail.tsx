@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, Check, ShoppingBag, Heart, ChevronRight } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
+import { useStock } from '@/hooks/useStock';
 import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,7 @@ export function ProductDetail() {
   const { products } = useProducts();
   const product = products.find(p => p.id === id);
   const { addToCart } = useCart();
+  const { isSoldOut, isAllSoldOut } = useStock();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
@@ -88,11 +90,14 @@ export function ProductDetail() {
     );
   }
 
+  const productAllSoldOut = product ? isAllSoldOut(product) : false;
+
   const handleAddToCart = () => {
     if (!selectedSize) {
       setShowSizeError(true);
       return;
     }
+    if (!product || isSoldOut(product.id, selectedSize)) return;
 
     setIsAdding(true);
     addToCart(product, selectedSize);
@@ -103,6 +108,7 @@ export function ProductDetail() {
   };
 
   const handleSizeSelect = (size: string) => {
+    if (product && isSoldOut(product.id, size)) return;
     setSelectedSize(size);
     setShowSizeError(false);
   };
@@ -208,19 +214,26 @@ export function ProductDetail() {
                 <span className="micro-label text-text-secondary/70">Code: {product.code}</span>
               </div>
               <div className="flex gap-2">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => handleSizeSelect(size)}
-                    className={`w-11 h-11 flex items-center justify-center micro-label transition-all duration-300 ${
-                      selectedSize === size
-                        ? 'bg-charcoal text-cream'
-                        : 'bg-white border border-charcoal/15 text-charcoal hover:border-gold'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {product.sizes.map((size) => {
+                  const sold = isSoldOut(product.id, size);
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => handleSizeSelect(size)}
+                      disabled={sold}
+                      title={sold ? 'Sold out' : undefined}
+                      className={`w-11 h-11 flex items-center justify-center micro-label transition-all duration-300 relative ${
+                        sold
+                          ? 'bg-beige border border-charcoal/10 text-charcoal/30 cursor-not-allowed line-through'
+                          : selectedSize === size
+                          ? 'bg-charcoal text-cream'
+                          : 'bg-white border border-charcoal/15 text-charcoal hover:border-gold'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
               </div>
               {showSizeError && (
                 <p className="text-gold text-sm mt-2">Please select a size</p>
@@ -231,14 +244,18 @@ export function ProductDetail() {
             <div className="flex gap-3 mb-6">
               <button
                 onClick={handleAddToCart}
-                disabled={isAdding}
+                disabled={isAdding || productAllSoldOut}
                 className={`flex-1 py-3 font-sans font-medium uppercase tracking-[0.12em] text-xs transition-all duration-300 flex items-center justify-center gap-2 ${
-                  isAdding
+                  productAllSoldOut
+                    ? 'bg-beige text-charcoal/40 cursor-not-allowed border border-charcoal/10'
+                    : isAdding
                     ? 'bg-gold text-cream'
                     : 'bg-charcoal text-cream hover:bg-gold'
                 }`}
               >
-                {isAdding ? (
+                {productAllSoldOut ? (
+                  <span>Sold Out</span>
+                ) : isAdding ? (
                   <>
                     <Check className="w-4 h-4" strokeWidth={1.5} />
                     <span>Added to Cart</span>
@@ -275,11 +292,11 @@ export function ProductDetail() {
             <div className="mt-5 flex items-center gap-2">
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
-                  product.inStock ? 'bg-green-500' : 'bg-red-500'
+                  productAllSoldOut ? 'bg-red-500' : 'bg-green-500'
                 }`}
               />
               <span className="micro-label text-text-secondary/70">
-                {product.inStock ? 'In Stock' : 'Out of Stock'}
+                {productAllSoldOut ? 'All Sizes Sold Out' : 'In Stock'}
               </span>
             </div>
           </div>

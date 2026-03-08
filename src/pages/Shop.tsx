@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Filter, X } from 'lucide-react';
 import { categories } from '@/data/products';
 import { useProducts } from '@/hooks/useProducts';
+import { useStock } from '@/hooks/useStock';
 import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -20,6 +21,7 @@ export function Shop() {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const { products, isLoading } = useProducts();
+  const { isAllSoldOut } = useStock();
 
   const filteredProducts =
     selectedCategory === 'all'
@@ -194,17 +196,27 @@ export function Shop() {
                   />
                 )}
                 {/* Badge */}
-                {product.featured && (
+                {product.featured && !isAllSoldOut(product) && (
                   <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
                     New
                   </span>
                 )}
+                {/* Sold Out Badge */}
+                {isAllSoldOut(product) && (
+                  <div className="absolute inset-0 bg-charcoal/40 flex items-center justify-center">
+                    <span className="micro-label bg-cream text-charcoal px-3 py-1">
+                      Sold Out
+                    </span>
+                  </div>
+                )}
                 {/* Quick View Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="px-3 py-1.5 bg-white/90 text-charcoal micro-label">
-                    Quick View
-                  </span>
-                </div>
+                {!isAllSoldOut(product) && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="px-3 py-1.5 bg-white/90 text-charcoal micro-label">
+                      Quick View
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Info */}

@@ -32,3 +32,7 @@ export interface Category {
   name: string;
   slug: string;
 }
+
+export interface StockState {
+  [key: string]: boolean; // e.g. "p001-M": true means that size is sold out
+}
