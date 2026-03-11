@@ -17,6 +17,26 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// ─── CORS ────────────────────────────────────────────────────
+
+const ALLOWED_ORIGINS = [
+  'https://www.houseofvarsha.in',
+  'https://houseofvarsha.in',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 // ─── Stock management (stock.json) ──────────────────────────
 
 const STOCK_FILE = path.join(__dirname, 'stock.json');

@@ -69,7 +69,7 @@ export function CartDrawer() {
 
     try {
       // 1. Create Razorpay order on server
-      const orderRes = await fetch('/api/checkout/create-order', {
+      const orderRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/checkout/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items, totalAmount: totalPrice }),
@@ -103,7 +103,7 @@ export function CartDrawer() {
         order_id: orderData.orderId,
         handler: async (response: RazorpayPaymentResponse) => {
           // 4. Verify payment on server
-          const verifyRes = await fetch('/api/checkout/verify', {
+          const verifyRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/checkout/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

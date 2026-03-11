@@ -15,7 +15,7 @@ export function useStock(): UseStockReturn {
 
   const fetchStock = useCallback(async () => {
     try {
-      const res = await fetch('/api/stock');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/stock`);
       if (res.ok) {
         const data = await res.json();
         setSoldSizes(data);
