@@ -6,12 +6,159 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// ─── CORS ────────────────────────────────────────────────────
+
+const ALLOWED_ORIGINS = [
+  'https://www.houseofvarsha.in',
+  'https://houseofvarsha.in',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
+// ─── Stock management (stock.json) ──────────────────────────
+
+const STOCK_FILE = path.join(__dirname, 'stock.json');
+
+function readStock() {
+  try {
+    if (!fs.existsSync(STOCK_FILE)) return {};
+    return JSON.parse(fs.readFileSync(STOCK_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function writeStock(stock) {
+  fs.writeFileSync(STOCK_FILE, JSON.stringify(stock, null, 2));
+}
+
+// GET /api/stock — returns sold size map { "p001-M": true, ... }
+app.get('/api/stock', (req, res) => {
+  res.json(readStock());
+});
+
+// ─── Razorpay checkout ───────────────────────────────────────
+
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+
+// POST /api/checkout/create-order
+app.post('/api/checkout/create-order', async (req, res) => {
+  try {
+    const { items, totalAmount } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+
+    if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+      return res.status(503).json({ error: 'Payment gateway not configured' });
+    }
+
+    // Check for sold-out items before creating order
+    const stock = readStock();
+    for (const item of items) {
+      const key = `${item.product.id}-${item.size}`;
+      if (stock[key]) {
+        return res.status(409).json({
+          error: `Sorry, ${item.product.name} in size ${item.size} is no longer available.`,
+        });
+      }
+    }
+
+    // Create Razorpay order via REST API (avoids SDK ESM issues)
+    const amountInPaise = Math.round(totalAmount * 100);
+    const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
+
+    const orderRes = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${auth}`,
+      },
+      body: JSON.stringify({
+        amount: amountInPaise,
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+      }),
+    });
+
+    if (!orderRes.ok) {
+      const errData = await orderRes.json();
+      console.error('[Razorpay] Order creation failed:', errData);
+      return res.status(502).json({ error: 'Failed to create payment order' });
+    }
+
+    const order = await orderRes.json();
+    res.json({ orderId: order.id, amount: order.amount, currency: order.currency, key: RAZORPAY_KEY_ID });
+  } catch (err) {
+    console.error('[Checkout create-order]', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/checkout/verify
+app.post('/api/checkout/verify', (req, res) => {
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, items } = req.body;
+
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({ success: false, error: 'Missing payment fields' });
+    }
+
+    if (!RAZORPAY_KEY_SECRET) {
+      return res.status(503).json({ success: false, error: 'Payment gateway not configured' });
+    }
+
+    // Verify HMAC-SHA256 signature
+    const expectedSignature = crypto
+      .createHmac('sha256', RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+      console.warn('[Checkout verify] Signature mismatch');
+      return res.status(400).json({ success: false, error: 'Payment verification failed' });
+    }
+
+    // Mark purchased sizes as sold
+    if (items && Array.isArray(items)) {
+      const stock = readStock();
+      for (const item of items) {
+        const key = `${item.product.id}-${item.size}`;
+        stock[key] = true;
+      }
+      writeStock(stock);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Checkout verify]', err.message);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
 
 // ─── Security headers ───────────────────────────────────────
 
@@ -56,8 +203,7 @@ async function fetchFromGoogleSheets() {
   })).toString('base64url');
 
   // Sign with private key
-  const { createSign } = await import('crypto');
-  const sign = createSign('RSA-SHA256');
+  const sign = crypto.createSign('RSA-SHA256');
   sign.update(`${header}.${payload}`);
   const signature = sign.sign(privateKey, 'base64url');
   const jwt = `${header}.${payload}.${signature}`;

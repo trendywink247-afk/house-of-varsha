@@ -14,7 +14,7 @@ import { products as staticProducts } from '@/data/products';
 // ─── Configuration ──────────────────────────────────────────
 
 const SHEETS_CSV_URL = import.meta.env.VITE_GOOGLE_SHEETS_CSV_URL || '';
-const SHEETS_API_ENDPOINT = import.meta.env.VITE_SHEETS_API_ENDPOINT || '/api/products';
+const SHEETS_API_ENDPOINT = import.meta.env.VITE_SHEETS_API_ENDPOINT || `${import.meta.env.VITE_API_URL || ''}/api/products`;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 // ─── In-memory client cache ─────────────────────────────────

@@ -23,18 +23,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = useCallback((product: Product, size: string) => {
     setItems(prev => {
-      const existingItem = prev.find(
+      // Only 1 unit per size — if already in cart, don't add again
+      const alreadyInCart = prev.some(
         item => item.product.id === product.id && item.size === size
       );
-      
-      if (existingItem) {
-        return prev.map(item =>
-          item.product.id === product.id && item.size === size
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      
+      if (alreadyInCart) return prev;
       return [...prev, { product, quantity: 1, size }];
     });
     setIsOpen(true);
@@ -53,11 +46,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart(productId, size);
       return;
     }
-    
+    // Cap at 1 — only 1 unit per size available
+    const capped = Math.min(quantity, 1);
     setItems(prev =>
       prev.map(item =>
         item.product.id === productId && item.size === size
-          ? { ...item, quantity }
+          ? { ...item, quantity: capped }
           : item
       )
     );
