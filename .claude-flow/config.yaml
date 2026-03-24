@@ -1,20 +1,33 @@
 # RuFlo V3 Runtime Configuration
-# Generated: 2026-03-24T00:50:12.007Z
+# House of Varsha - Hostinger VPS
+# Server: srv1750.hstgr.io | IP: 145.223.17.226 | Location: India
 
 version: "3.0.0"
 
+server:
+  name: srv1750
+  ip: 145.223.17.226
+  location: asia-india
+  maxProcesses: 120
+  ram: 3072
+  cpuCores: 2
+
 swarm:
-  topology: hierarchical-mesh
-  maxAgents: 15
+  topology: hierarchical
+  maxAgents: 8
   autoScale: true
   coordinationStrategy: consensus
 
 memory:
-  backend: hybrid
-  enableHNSW: true
+  backend: mysql
+  enableHNSW: false
   persistPath: .claude-flow/data
-  cacheSize: 100
-  # ADR-049: Self-Learning Memory
+  cacheSize: 50
+  mysql:
+    host: localhost
+    user: u524306250_ruflo
+    database: u524306250_ruflo
+    port: 3306
   learningBridge:
     enabled: true
     sonaMode: balanced
@@ -24,14 +37,14 @@ memory:
   memoryGraph:
     enabled: true
     pageRankDamping: 0.85
-    maxNodes: 5000
+    maxNodes: 2000
     similarityThreshold: 0.8
   agentScopes:
     enabled: true
     defaultScope: project
 
 neural:
-  enabled: true
+  enabled: false
   modelPath: .claude-flow/neural
 
 hooks:
@@ -39,5 +52,13 @@ hooks:
   autoExecute: true
 
 mcp:
-  autoStart: false
-  port: 3000
+  autoStart: true
+  port: 3001
+
+project:
+  name: house-of-varsha
+  domain: houseofvarsha.in
+  stack: react-vite-express
+  nodeVersion: "22"
+  deployPath: /home/u524306250/domains/houseofvarsha.in/public_html
+  sourcePath: /home/u524306250/house-of-varsha-src

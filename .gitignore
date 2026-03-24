@@ -20,6 +20,10 @@ yarn-debug.log*
 .env
 .env.local
 .env*.local
+.claude-flow/.env
+.claude-flow/data/
+.claude-flow/sessions/
+.claude-flow/logs/
 
 # TypeScript
 *.tsbuildinfo
