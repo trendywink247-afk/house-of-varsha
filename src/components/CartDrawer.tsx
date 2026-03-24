@@ -18,12 +18,26 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
+interface AddressForm {
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+const emptyAddress: AddressForm = { name: '', phone: '', address: '', city: '', state: '', pincode: '' };
+
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeFromCart, totalPrice, clearCart } = useCart();
   const drawerRef = useRef<HTMLDivElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [step, setStep] = useState<'cart' | 'address'>('cart');
+  const [addressForm, setAddressForm] = useState<AddressForm>(emptyAddress);
+  const [addressErrors, setAddressErrors] = useState<Partial<AddressForm>>({});
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -33,6 +47,10 @@ export function CartDrawer() {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
+    } else {
+      setStep('cart');
+      setAddressForm(emptyAddress);
+      setAddressErrors({});
     }
 
     return () => {
@@ -47,7 +65,7 @@ export function CartDrawer() {
     }
   };
 
-  const buildWhatsAppUrl = useCallback((paymentId: string) => {
+  const buildWhatsAppUrl = useCallback((paymentId: string, addr: AddressForm) => {
     const phoneNumber = '917989733041';
     let message = '✅ New Order Confirmed via Razorpay!\n\n';
     message += '*Order Details:*\n\n';
@@ -57,9 +75,25 @@ export function CartDrawer() {
       message += `   Price: ${item.product.price}\n\n`;
     });
     message += `*Total: ₹${totalPrice.toLocaleString()}*\n`;
-    message += `Payment ID: ${paymentId}`;
+    message += `Payment ID: ${paymentId}\n\n`;
+    message += `📦 *Delivery Address:*\n`;
+    message += `${addr.name}\n`;
+    message += `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}\n`;
+    message += `Phone: ${addr.phone}`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   }, [items, totalPrice]);
+
+  const validateAddress = (): boolean => {
+    const errors: Partial<AddressForm> = {};
+    if (!addressForm.name.trim()) errors.name = 'Name is required';
+    if (!/^\d{10}$/.test(addressForm.phone)) errors.phone = 'Enter a valid 10-digit phone number';
+    if (!addressForm.address.trim()) errors.address = 'Address is required';
+    if (!addressForm.city.trim()) errors.city = 'City is required';
+    if (!addressForm.state.trim()) errors.state = 'State is required';
+    if (!/^\d{6}$/.test(addressForm.pincode)) errors.pincode = 'Enter a valid 6-digit pincode';
+    setAddressErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleCheckout = useCallback(async () => {
     if (items.length === 0 || isProcessing) return;
@@ -101,6 +135,10 @@ export function CartDrawer() {
         name: 'House of Varsha',
         description: 'Indian Ethnic Wear',
         order_id: orderData.orderId,
+        prefill: {
+          name: addressForm.name,
+          contact: addressForm.phone,
+        },
         handler: async (response: RazorpayPaymentResponse) => {
           // 4. Verify payment on server
           const verifyRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/checkout/verify`, {
@@ -120,9 +158,10 @@ export function CartDrawer() {
             // 5. Success: clear cart, notify store owner via WhatsApp
             clearCart();
             setPaymentStatus('success');
+            setStep('cart');
             setStatusMessage('Payment successful! Thank you for your order.');
-            // Open WhatsApp with order summary for store owner
-            const waUrl = buildWhatsAppUrl(response.razorpay_payment_id);
+            // Open WhatsApp with order summary + address for store owner
+            const waUrl = buildWhatsAppUrl(response.razorpay_payment_id, addressForm);
             window.open(waUrl, '_blank');
           } else {
             setPaymentStatus('error');
@@ -145,7 +184,7 @@ export function CartDrawer() {
       setStatusMessage('Something went wrong. Please try again.');
       setIsProcessing(false);
     }
-  }, [items, totalPrice, isProcessing, clearCart, buildWhatsAppUrl]);
+  }, [items, totalPrice, isProcessing, clearCart, buildWhatsAppUrl, addressForm]);
 
   return (
     <div
@@ -167,9 +206,22 @@ export function CartDrawer() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-charcoal/10">
-            <h2 className="font-display text-xl uppercase tracking-[0.1em] text-charcoal">
-              Your Cart
-            </h2>
+            <div className="flex items-center gap-2">
+              {step === 'address' && (
+                <button
+                  onClick={() => setStep('cart')}
+                  className="p-1 text-charcoal/60 hover:text-charcoal transition-colors"
+                  aria-label="Back to cart"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+              <h2 className="font-display text-xl uppercase tracking-[0.1em] text-charcoal">
+                {step === 'address' ? 'Delivery Details' : 'Your Cart'}
+              </h2>
+            </div>
             <button
               onClick={closeCart}
               className="p-2 text-charcoal/60 hover:text-charcoal transition-colors"
@@ -181,7 +233,42 @@ export function CartDrawer() {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-5">
-            {items.length === 0 ? (
+            {step === 'address' ? (
+              <div className="space-y-4">
+                <p className="body-text text-text-secondary/70 text-xs mb-2">
+                  All fields are required for delivery.
+                </p>
+                {(
+                  [
+                    { key: 'name', label: 'Full Name', type: 'text', placeholder: 'Priya Sharma' },
+                    { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: '9876543210' },
+                    { key: 'address', label: 'Address Line 1', type: 'text', placeholder: 'Flat / Building / Street' },
+                    { key: 'city', label: 'City', type: 'text', placeholder: 'Mumbai' },
+                    { key: 'state', label: 'State', type: 'text', placeholder: 'Maharashtra' },
+                    { key: 'pincode', label: 'Pincode', type: 'text', placeholder: '400001' },
+                  ] as { key: keyof AddressForm; label: string; type: string; placeholder: string }[]
+                ).map(({ key, label, type, placeholder }) => (
+                  <div key={key}>
+                    <label className="micro-label text-charcoal/70 block mb-1">{label}</label>
+                    <input
+                      type={type}
+                      placeholder={placeholder}
+                      value={addressForm[key]}
+                      onChange={(e) => {
+                        setAddressForm((prev) => ({ ...prev, [key]: e.target.value }));
+                        if (addressErrors[key]) setAddressErrors((prev) => ({ ...prev, [key]: undefined }));
+                      }}
+                      className={`w-full px-3 py-2 bg-cream border text-charcoal text-sm font-sans placeholder:text-charcoal/30 focus:outline-none focus:border-charcoal transition-colors ${
+                        addressErrors[key] ? 'border-red-400' : 'border-charcoal/20'
+                      }`}
+                    />
+                    {addressErrors[key] && (
+                      <p className="text-red-600 text-xs mt-1">{addressErrors[key]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 {paymentStatus === 'success' ? (
                   <>
@@ -264,8 +351,34 @@ export function CartDrawer() {
             )}
           </div>
 
-          {/* Footer */}
-          {items.length > 0 && (
+          {/* Address Step Footer */}
+          {step === 'address' && (
+            <div className="p-5 border-t border-charcoal/10 bg-beige/20">
+              {paymentStatus === 'error' && (
+                <p className="body-text text-red-600 text-xs mb-3 text-center">{statusMessage}</p>
+              )}
+              <div className="flex justify-between items-center mb-4">
+                <span className="body-text text-text-secondary">Total</span>
+                <span className="font-display text-lg text-charcoal">₹{totalPrice.toLocaleString()}</span>
+              </div>
+              <button
+                onClick={() => { if (validateAddress()) handleCheckout(); }}
+                disabled={isProcessing}
+                className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? 'Processing...' : 'Continue to Payment'}
+              </button>
+              <button
+                onClick={() => setStep('cart')}
+                className="w-full mt-2 py-2.5 text-charcoal font-sans font-medium uppercase tracking-[0.12em] text-xs hover:text-gold transition-colors"
+              >
+                Back to Cart
+              </button>
+            </div>
+          )}
+
+          {/* Cart Footer */}
+          {items.length > 0 && step === 'cart' && (
             <div className="p-5 border-t border-charcoal/10 bg-beige/20">
               {paymentStatus === 'error' && (
                 <p className="body-text text-red-600 text-xs mb-3 text-center">{statusMessage}</p>
@@ -277,14 +390,13 @@ export function CartDrawer() {
                 </span>
               </div>
               <p className="body-text text-text-secondary/70 text-xs mb-5">
-                Shipping and taxes calculated at checkout.
+                Enter your delivery address on the next step.
               </p>
               <button
-                onClick={handleCheckout}
-                disabled={isProcessing}
-                className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+                onClick={() => setStep('address')}
+                className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300"
               >
-                {isProcessing ? 'Processing...' : 'Proceed to Pay'}
+                Proceed to Pay
               </button>
               <button
                 onClick={closeCart}
