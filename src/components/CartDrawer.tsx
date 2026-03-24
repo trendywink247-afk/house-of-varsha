@@ -149,6 +149,7 @@ export function CartDrawer() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               items,
+              address: addressForm,
             }),
           });
 

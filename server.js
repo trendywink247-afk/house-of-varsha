@@ -379,7 +379,7 @@ app.post('/api/checkout/create-order', async (req, res) => {
 // POST /api/checkout/verify
 app.post('/api/checkout/verify', async (req, res) => {
   try {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, items } = req.body;
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, items, address } = req.body;
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
       return res.status(400).json({ success: false, error: 'Missing payment fields' });
@@ -398,6 +398,16 @@ app.post('/api/checkout/verify', async (req, res) => {
     if (expectedSignature !== razorpay_signature) {
       console.warn('[Checkout verify] Signature mismatch');
       return res.status(400).json({ success: false, error: 'Payment verification failed' });
+    }
+
+    // Calculate order total
+    let orderTotal = 0;
+    if (items && Array.isArray(items)) {
+      for (const item of items) {
+        const price = parsePrice(item.product?.price || '0');
+        const qty = item.quantity || 1;
+        if (!isNaN(price)) orderTotal += price * qty;
+      }
     }
 
     // Mark purchased sizes as sold
@@ -429,10 +439,116 @@ app.post('/api/checkout/verify', async (req, res) => {
       }
     }
 
+    // ─── Save order to MySQL (GUARANTEED RECORD) ───────────
+    const addr = address || {};
+    const customerName = (addr.name || '').trim().slice(0, 255);
+    const customerPhone = (addr.phone || '').trim().slice(0, 20);
+    const customerEmail = (addr.email || '').trim().slice(0, 255);
+
+    if (pool && dbConnected) {
+      try {
+        await pool.execute(
+          `INSERT INTO hov_orders (order_id, payment_id, amount, currency, status, customer_name, customer_phone, customer_email, address_line, city, state, pincode, items_json)
+           VALUES (?, ?, ?, 'INR', 'paid', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            razorpay_order_id,
+            razorpay_payment_id,
+            orderTotal,
+            customerName,
+            customerPhone,
+            customerEmail,
+            (addr.address || '').trim().slice(0, 500),
+            (addr.city || '').trim().slice(0, 100),
+            (addr.state || '').trim().slice(0, 100),
+            (addr.pincode || '').trim().slice(0, 10),
+            JSON.stringify((items || []).map(i => ({
+              id: i.product?.id,
+              name: i.product?.name,
+              size: i.size,
+              price: i.product?.price,
+            }))),
+          ],
+        );
+        console.log(`[Order] Saved order ${razorpay_order_id} — ₹${orderTotal}`);
+      } catch (err) {
+        console.error('[Order] MySQL insert failed:', err.message);
+      }
+    }
+
+    // ─── Email notification to store owner ──────────────────
+    const contactEmail = process.env.CONTACT_EMAIL || 'hello@houseofvarsha.com';
+    if (smtpTransport) {
+      try {
+        const itemLines = (items || []).map((item, i) =>
+          `${i + 1}. ${item.product?.name || 'Item'} — Size: ${item.size} — ${item.product?.price || '?'}`
+        ).join('\n');
+
+        await smtpTransport.sendMail({
+          from: `"House of Varsha Orders" <${process.env.SMTP_USER}>`,
+          to: contactEmail,
+          subject: `🛍 New Order — ₹${orderTotal.toLocaleString()} — ${customerName || 'Customer'}`,
+          text: [
+            `NEW ORDER RECEIVED`,
+            ``,
+            `Payment ID: ${razorpay_payment_id}`,
+            `Order ID: ${razorpay_order_id}`,
+            `Amount: ₹${orderTotal.toLocaleString()}`,
+            ``,
+            `ITEMS:`,
+            itemLines,
+            ``,
+            `DELIVERY ADDRESS:`,
+            `${customerName}`,
+            `${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}`,
+            `Phone: ${customerPhone}`,
+            customerEmail ? `Email: ${customerEmail}` : '',
+          ].filter(Boolean).join('\n'),
+          html: [
+            `<h2>New Order Received</h2>`,
+            `<p><strong>Payment ID:</strong> ${razorpay_payment_id}</p>`,
+            `<p><strong>Order ID:</strong> ${razorpay_order_id}</p>`,
+            `<p><strong>Amount:</strong> ₹${orderTotal.toLocaleString()}</p>`,
+            `<hr>`,
+            `<h3>Items</h3>`,
+            `<ul>${(items || []).map(i => `<li>${i.product?.name || 'Item'} — Size: ${i.size} — ${i.product?.price || '?'}</li>`).join('')}</ul>`,
+            `<hr>`,
+            `<h3>Delivery Address</h3>`,
+            `<p>${customerName}<br>${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}<br>Phone: ${customerPhone}</p>`,
+          ].join('\n'),
+        });
+        console.log(`[Order] Email notification sent for ${razorpay_order_id}`);
+      } catch (err) {
+        console.error('[Order] Email notification failed:', err.message);
+      }
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('[Checkout verify]', err.message);
     res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// GET /api/orders — view all orders (protected)
+const ORDERS_SECRET = process.env.ORDERS_SECRET || 'hov-orders-2026';
+
+app.get('/api/orders', async (req, res) => {
+  if (req.headers['x-orders-secret'] !== ORDERS_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!pool || !dbConnected) {
+    return res.status(503).json({ error: 'Database not available' });
+  }
+
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id, order_id, payment_id, amount, status, customer_name, customer_phone, address_line, city, state, pincode, items_json, created_at FROM hov_orders ORDER BY created_at DESC LIMIT 100',
+    );
+    res.json({ orders: rows });
+  } catch (err) {
+    console.error('[Orders]', err.message);
+    res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
 
