@@ -9,6 +9,7 @@ import { CustomCursor } from '@/components/CustomCursor';
 import { Preloader } from '@/components/Preloader';
 import { PageTransition } from '@/components/PageTransition';
 import { FilmGrain } from '@/components/FilmGrain';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Layout
 import { Header } from '@/components/Header';
@@ -71,6 +72,7 @@ function App() {
   const [preloaderDone, setPreloaderDone] = useState(false);
 
   return (
+    <ErrorBoundary>
     <CartProvider>
       <BrowserRouter>
         <SmoothScrollProvider>
@@ -125,6 +127,7 @@ function App() {
         </SmoothScrollProvider>
       </BrowserRouter>
     </CartProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -17,6 +17,13 @@ export function Contact() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -46,11 +53,52 @@ export function Contact() {
     return () => ctx.revert();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.message) {
+    setError(null);
+
+    if (!formData.name || !formData.email || !formData.message) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (!validateEmail(formData.email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Failed to send message. Please try again.');
+      }
+
+      const data = await res.json();
+
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
+
+      if (data.whatsappUrl) {
+        window.open(data.whatsappUrl, '_blank');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -251,10 +299,24 @@ export function Contact() {
 
                   <button
                     type="submit"
-                    className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300"
+                    disabled={isSubmitting}
+                    className="w-full py-3 bg-charcoal text-cream font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-gold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Send Message
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
+
+                  {error && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 text-center">
+                      <p className="body-text text-red-600 text-sm mb-3">{error}</p>
+                      <button
+                        type="button"
+                        onClick={() => setError(null)}
+                        className="px-6 py-2 border border-red-300 text-red-600 font-sans font-medium uppercase tracking-[0.12em] text-xs hover:bg-red-100 transition-colors duration-300"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  )}
                 </form>
               )}
             </div>
