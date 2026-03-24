@@ -86,7 +86,7 @@ export function Footer() {
                   href="https://www.instagram.com/houseof_varsha"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 text-charcoal/60 hover:text-gold transition-colors"
+                  className="p-3 -m-1 text-charcoal/60 hover:text-gold transition-colors"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-4 h-4" strokeWidth={1.5} />
@@ -95,14 +95,14 @@ export function Footer() {
                   href="https://youtube.com/@houseofvarsha"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 text-charcoal/60 hover:text-gold transition-colors"
+                  className="p-3 -m-1 text-charcoal/60 hover:text-gold transition-colors"
                   aria-label="YouTube"
                 >
                   <Youtube className="w-4 h-4" strokeWidth={1.5} />
                 </a>
                 <a
                   href="mailto:hello@houseofvarsha.com"
-                  className="p-2 text-charcoal/60 hover:text-gold transition-colors"
+                  className="p-3 -m-1 text-charcoal/60 hover:text-gold transition-colors"
                   aria-label="Email"
                 >
                   <Mail className="w-4 h-4" strokeWidth={1.5} />

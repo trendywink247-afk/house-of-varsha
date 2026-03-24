@@ -16,6 +16,11 @@ import { Shop } from '@/pages/Shop';
 import { ProductDetail } from '@/pages/ProductDetail';
 import { About } from '@/pages/About';
 import { Contact } from '@/pages/Contact';
+import { Privacy } from '@/pages/Privacy';
+import { Terms } from '@/pages/Terms';
+import { FAQs } from '@/pages/FAQs';
+import { NotFound } from '@/pages/NotFound';
+import { FloatingButtons } from '@/components/FloatingButtons';
 import { CartProvider } from '@/hooks/useCart';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -87,8 +92,15 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/collections" element={<Shop />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/faqs" element={<FAQs />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           </div>
+
+          {/* Floating WhatsApp + Back to Top */}
+          <FloatingButtons />
         </div>
       </BrowserRouter>
     </CartProvider>

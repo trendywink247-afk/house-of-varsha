@@ -2,7 +2,7 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Filter, X, Search } from 'lucide-react';
+import { ArrowRight, Filter, X, Search, ArrowUpDown } from 'lucide-react';
 import { categories } from '@/data/products';
 import { useProducts } from '@/hooks/useProducts';
 import { useStock } from '@/hooks/useStock';
@@ -19,6 +19,7 @@ export function Shop() {
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'default' | 'low' | 'high'>('default');
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -40,8 +41,15 @@ export function Shop() {
           p.description.toLowerCase().includes(q)
       );
     }
+    if (sortBy !== 'default') {
+      filtered = [...filtered].sort((a, b) => {
+        const priceA = parseInt(a.price.replace(/[^\d]/g, ''));
+        const priceB = parseInt(b.price.replace(/[^\d]/g, ''));
+        return sortBy === 'low' ? priceA - priceB : priceB - priceA;
+      });
+    }
     return filtered;
-  }, [products, selectedCategory, searchQuery]);
+  }, [products, selectedCategory, searchQuery, sortBy]);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -163,10 +171,25 @@ export function Shop() {
             <span className="micro-label">Filter</span>
           </button>
 
-          {/* Results Count */}
-          <span className="micro-label text-text-secondary/70">
-            {isLoading ? 'Loading...' : `${filteredProducts.length} Products`}
-          </span>
+          {/* Sort + Count */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <ArrowUpDown className="w-3 h-3 text-charcoal/50" strokeWidth={1.5} />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'default' | 'low' | 'high')}
+                className="bg-transparent micro-label text-charcoal/70 focus:outline-none cursor-pointer"
+                aria-label="Sort products"
+              >
+                <option value="default">Default</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+              </select>
+            </div>
+            <span className="micro-label text-text-secondary/70">
+              {isLoading ? 'Loading...' : `${filteredProducts.length} Products`}
+            </span>
+          </div>
         </div>
 
         {/* Mobile Filter Dropdown */}

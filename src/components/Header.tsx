@@ -73,10 +73,10 @@ export function Header() {
           <div className="flex items-center gap-4">
             <button
               onClick={toggleCart}
-              className="relative p-2 text-charcoal/70 hover:text-charcoal transition-colors duration-300"
+              className="relative p-3 -m-1 text-charcoal/70 hover:text-charcoal transition-colors duration-300"
               aria-label="Open cart"
             >
-              <ShoppingBag className="w-4 h-4" strokeWidth={1.5} />
+              <ShoppingBag className="w-5 h-5" strokeWidth={1.5} />
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold text-white text-[9px] font-medium rounded-full flex items-center justify-center">
                   {totalItems}
@@ -87,7 +87,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-charcoal"
+              className="md:hidden p-3 -m-1 text-charcoal"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
