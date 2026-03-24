@@ -387,7 +387,7 @@ export function Footer() {
             </Link>
             <span className="micro-label text-text-secondary/40">|</span>
             <a
-              href="https://geekspace.dev"
+              href="https://ai.geekspace.space"
               target="_blank"
               rel="noopener noreferrer"
               className="micro-label text-text-secondary/40 hover:text-gold transition-colors duration-300"
