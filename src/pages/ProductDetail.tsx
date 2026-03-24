@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -7,10 +7,52 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useStock } from '@/hooks/useStock';
 import { useWishlist } from '@/hooks/useWishlist';
+import { useIsDesktop, useHasFinePointer, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
 import { Footer } from '@/sections/Footer';
 import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ------------------------------------------------------------------ */
+/*  SVG Check Draw-in Animation Component                             */
+/* ------------------------------------------------------------------ */
+
+function AnimatedCheck({ className }: { className?: string }) {
+  const pathRef = useRef<SVGPathElement>(null);
+
+  useEffect(() => {
+    const path = pathRef.current;
+    if (!path) return;
+
+    const length = path.getTotalLength();
+    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+    gsap.to(path, {
+      strokeDashoffset: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  }, []);
+
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path ref={pathRef} d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  ProductDetail Page                                                 */
+/* ------------------------------------------------------------------ */
 
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -20,37 +62,57 @@ export function ProductDetail() {
   const { isSoldOut, isAllSoldOut } = useStock();
   const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
+  const isDesktop = useIsDesktop();
+  const hasFinePointer = useHasFinePointer();
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [showSizeError, setShowSizeError] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState('50% 50%');
 
   const galleryRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
+  const mainImageRef = useRef<HTMLImageElement>(null);
+  const relatedRef = useRef<HTMLDivElement>(null);
+  const sizeButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   // Related products (same category, excluding current)
   const relatedProducts = products
     .filter((p) => p.category === product?.category && p.id !== product?.id)
     .slice(0, 4);
 
+  /* ---- Entrance Animations ---- */
+
   useEffect(() => {
     if (!product) return;
 
     const gallery = galleryRef.current;
     const info = infoRef.current;
+    const related = relatedRef.current;
 
     if (!gallery || !info) return;
 
+    if (prefersReducedMotion) {
+      gsap.set(gallery.children, { opacity: 1, clipPath: 'inset(0)' });
+      gsap.set(info.children, { opacity: 1, y: 0 });
+      if (related) gsap.set(related.children, { opacity: 1, clipPath: 'inset(0)', y: 0, rotate: 0 });
+      return;
+    }
+
     const ctx = gsap.context(() => {
+      // Gallery: clipPath reveal
       gsap.fromTo(
         gallery.children,
-        { x: -20, opacity: 0 },
+        { clipPath: 'inset(100% 0 0 0)', opacity: 0 },
         {
-          x: 0,
+          clipPath: 'inset(0% 0 0 0)',
           opacity: 1,
           stagger: 0.08,
-          duration: 0.6,
-          ease: 'power2.out',
+          duration: 0.8,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: gallery,
             start: 'top 85%',
@@ -59,9 +121,10 @@ export function ProductDetail() {
         }
       );
 
+      // Info panel: stagger up
       gsap.fromTo(
         info.children,
-        { y: 20, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
@@ -75,10 +138,121 @@ export function ProductDetail() {
           },
         }
       );
+
+      // Related products: stagger cascade (same as FeaturedCollection)
+      if (related && related.children.length > 0) {
+        gsap.fromTo(
+          related.children,
+          {
+            clipPath: 'inset(100% 0 0 0)',
+            y: 40,
+            opacity: 0,
+            rotate: -1,
+          },
+          {
+            clipPath: 'inset(0% 0 0 0)',
+            y: 0,
+            opacity: 1,
+            rotate: 0,
+            stagger: 0.1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: related,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
     });
 
     return () => ctx.revert();
-  }, [product]);
+  }, [product, prefersReducedMotion]);
+
+  /* ---- Image Zoom Handlers (desktop fine pointer only) ---- */
+
+  const handleImageMouseEnter = useCallback(() => {
+    if (!hasFinePointer) return;
+    setIsZooming(true);
+  }, [hasFinePointer]);
+
+  const handleImageMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!hasFinePointer) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setZoomOrigin(`${x}% ${y}%`);
+    },
+    [hasFinePointer]
+  );
+
+  const handleImageMouseLeave = useCallback(() => {
+    if (!hasFinePointer) return;
+    setIsZooming(false);
+  }, [hasFinePointer]);
+
+  /* ---- Size Select Animation ---- */
+
+  const handleSizeSelect = (size: string) => {
+    if (product && isSoldOut(product.id, size)) return;
+    setSelectedSize(size);
+    setShowSizeError(false);
+
+    // Pulse animation on the size button
+    const btn = sizeButtonRefs.current.get(size);
+    if (btn && !prefersReducedMotion) {
+      gsap.fromTo(
+        btn,
+        { scale: 1 },
+        {
+          scale: 1.15,
+          duration: 0.15,
+          ease: 'power2.out',
+          yoyo: true,
+          repeat: 1,
+        }
+      );
+    }
+  };
+
+  /* ---- Add to Cart ---- */
+
+  const addToCartBtnRef = useRef<HTMLButtonElement>(null);
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      setShowSizeError(true);
+      return;
+    }
+    if (!product || isSoldOut(product.id, selectedSize)) return;
+
+    setIsAdding(true);
+    addToCart(product, selectedSize);
+
+    // Animate button bg from charcoal to gold
+    const btn = addToCartBtnRef.current;
+    if (btn && !prefersReducedMotion) {
+      gsap.to(btn, {
+        backgroundColor: '#C9B18A',
+        duration: 0.4,
+        ease: 'power2.out',
+      });
+    }
+
+    setTimeout(() => {
+      setIsAdding(false);
+      // Animate back
+      if (btn && !prefersReducedMotion) {
+        gsap.to(btn, {
+          backgroundColor: '#2C2C2C',
+          duration: 0.3,
+          ease: 'power2.out',
+        });
+      }
+    }, 1500);
+  };
 
   if (!product) {
     return (
@@ -94,27 +268,6 @@ export function ProductDetail() {
   }
 
   const productAllSoldOut = product ? isAllSoldOut(product) : false;
-
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      setShowSizeError(true);
-      return;
-    }
-    if (!product || isSoldOut(product.id, selectedSize)) return;
-
-    setIsAdding(true);
-    addToCart(product, selectedSize);
-
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 1500);
-  };
-
-  const handleSizeSelect = (size: string) => {
-    if (product && isSoldOut(product.id, size)) return;
-    setSelectedSize(size);
-    setShowSizeError(false);
-  };
 
   return (
     <div className="min-h-screen bg-cream pt-24 lg:pt-32 pb-16">
@@ -136,12 +289,23 @@ export function ProductDetail() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           {/* Gallery */}
           <div ref={galleryRef}>
-            {/* Main Image */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
+            {/* Main Image with Zoom */}
+            <div
+              className="relative aspect-[3/4] overflow-hidden bg-beige mb-3 cursor-crosshair"
+              onMouseEnter={handleImageMouseEnter}
+              onMouseMove={handleImageMouseMove}
+              onMouseLeave={handleImageMouseLeave}
+            >
               <img
+                ref={mainImageRef}
                 src={optimizeImg(product.images[selectedImage], 800)}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-300 ease-out"
+                style={{
+                  transform: isZooming && hasFinePointer ? 'scale(2)' : 'scale(1)',
+                  transformOrigin: zoomOrigin,
+                }}
               />
               {/* Navigation Arrows */}
               {product.images.length > 1 && (
@@ -152,7 +316,7 @@ export function ProductDetail() {
                         prev === 0 ? product.images.length - 1 : prev - 1
                       )
                     }
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center hover:bg-white transition-colors z-10"
                     aria-label="Previous image"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -163,7 +327,7 @@ export function ProductDetail() {
                         prev === product.images.length - 1 ? 0 : prev + 1
                       )
                     }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 flex items-center justify-center hover:bg-white transition-colors z-10"
                     aria-label="Next image"
                   >
                     <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -188,6 +352,7 @@ export function ProductDetail() {
                     <img
                       src={optimizeImg(image, 80)}
                       alt={`${product.name} - view ${index + 1}`}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -196,8 +361,12 @@ export function ProductDetail() {
             )}
           </div>
 
-          {/* Product Info */}
-          <div ref={infoRef} className="lg:pt-4">
+          {/* Product Info — Sticky on Desktop */}
+          <div
+            ref={infoRef}
+            className={`lg:pt-4 ${isDesktop ? 'lg:self-start' : ''}`}
+            style={isDesktop ? { position: 'sticky', top: '120px' } : undefined}
+          >
             {/* Category & Name */}
             <span className="micro-label text-gold mb-2 block">{product.category}</span>
             <h1 className="font-display text-2xl lg:text-3xl text-charcoal mb-3">
@@ -222,10 +391,13 @@ export function ProductDetail() {
                   return (
                     <button
                       key={size}
+                      ref={(el) => {
+                        if (el) sizeButtonRefs.current.set(size, el);
+                      }}
                       onClick={() => handleSizeSelect(size)}
                       disabled={sold}
                       title={sold ? 'Sold out' : undefined}
-                      className={`w-11 h-11 flex items-center justify-center micro-label transition-all duration-300 relative ${
+                      className={`w-11 h-11 flex items-center justify-center micro-label transition-all duration-300 relative overflow-hidden ${
                         sold
                           ? 'bg-beige border border-charcoal/10 text-charcoal/30 cursor-not-allowed line-through'
                           : selectedSize === size
@@ -246,6 +418,7 @@ export function ProductDetail() {
             {/* Actions */}
             <div className="flex gap-3 mb-6">
               <button
+                ref={addToCartBtnRef}
                 onClick={handleAddToCart}
                 disabled={isAdding || productAllSoldOut}
                 className={`flex-1 py-3 font-sans font-medium uppercase tracking-[0.12em] text-xs transition-all duration-300 flex items-center justify-center gap-2 ${
@@ -260,7 +433,7 @@ export function ProductDetail() {
                   <span>Sold Out</span>
                 ) : isAdding ? (
                   <>
-                    <Check className="w-4 h-4" strokeWidth={1.5} />
+                    <AnimatedCheck className="w-4 h-4" />
                     <span>Added to Cart</span>
                   </>
                 ) : (
@@ -328,7 +501,10 @@ export function ProductDetail() {
                 />
               </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+            <div
+              ref={relatedRef}
+              className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"
+            >
               {relatedProducts.map((relatedProduct) => (
                 <Link
                   key={relatedProduct.id}

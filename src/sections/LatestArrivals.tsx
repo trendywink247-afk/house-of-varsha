@@ -1,17 +1,24 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
-import { optimizeImg } from '@/lib/utils';
+import { useHasFinePointer, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
+import { MagneticButton } from '@/components/MagneticButton';
+import { ProductCard } from '@/components/ProductCard';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 export function LatestArrivals() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const productsRef = useRef<HTMLDivElement>(null);
+
+  const hasFinePointer = useHasFinePointer();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const { products } = useProducts();
   // Get latest 4 products
@@ -20,13 +27,51 @@ export function LatestArrivals() {
   useEffect(() => {
     const section = sectionRef.current;
     const header = headerRef.current;
-    const products = productsRef.current;
+    const title = titleRef.current;
+    const productsGrid = productsRef.current;
 
-    if (!section || !header || !products) return;
+    if (!section || !header || !title || !productsGrid) return;
+
+    // If reduced motion, show everything immediately
+    if (prefersReducedMotion) {
+      gsap.set(header.children, { opacity: 1, y: 0 });
+      gsap.set(productsGrid.children, {
+        opacity: 1,
+        y: 0,
+        clipPath: 'inset(0% 0 0 0)',
+        rotate: 0,
+      });
+      return;
+    }
 
     const ctx = gsap.context(() => {
+      /* ---- SplitText title reveal ---- */
+      const split = new SplitText(title, { type: 'words' });
+
+      // "Latest" revealed word-by-word, then "Arrivals" in gold
+      const allWords = split.words;
+      gsap.set(allWords, { opacity: 0, y: 30 });
+
+      gsap.to(allWords, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.08,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: header,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse',
+        },
+      });
+
+      /* ---- Header elements (micro-label, link) fade in ---- */
+      const headerChildren = Array.from(header.children).filter(
+        (el) => el !== title && !el.contains(title),
+      );
+
       gsap.fromTo(
-        header.children,
+        headerChildren,
         { y: 20, opacity: 0 },
         {
           y: 0,
@@ -39,29 +84,39 @@ export function LatestArrivals() {
             start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
-        }
+        },
       );
 
+      /* ---- Card entrance: clip-path reveal from bottom ---- */
+      const cards = productsGrid.children;
+
       gsap.fromTo(
-        products.children,
-        { y: 30, opacity: 0 },
+        cards,
         {
+          clipPath: 'inset(100% 0 0 0)',
+          y: 40,
+          opacity: 0,
+          rotate: -2,
+        },
+        {
+          clipPath: 'inset(0% 0 0 0)',
           y: 0,
           opacity: 1,
-          stagger: 0.08,
-          duration: 0.6,
-          ease: 'power2.out',
+          rotate: 0,
+          stagger: 0.12,
+          duration: 0.8,
+          ease: 'power3.out',
           scrollTrigger: {
-            trigger: products,
+            trigger: productsGrid,
             start: 'top 80%',
             toggleActions: 'play none none reverse',
           },
-        }
+        },
       );
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion, hasFinePointer]);
 
   return (
     <section
@@ -76,21 +131,24 @@ export function LatestArrivals() {
         >
           <div>
             <span className="micro-label text-gold mb-2 block">Just In</span>
-            <h2 className="section-title text-charcoal">
+            <h2 ref={titleRef} className="section-title text-charcoal">
               Latest
               <span className="text-gold ml-2">Arrivals</span>
             </h2>
           </div>
-          <Link
-            to="/shop"
-            className="inline-flex items-center gap-2 cta-link text-charcoal group"
-          >
-            <span>View All Products</span>
-            <ArrowRight
-              className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-              strokeWidth={1.5}
-            />
-          </Link>
+
+          <MagneticButton>
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 cta-link text-charcoal group"
+            >
+              <span>View All Products</span>
+              <ArrowRight
+                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+                strokeWidth={1.5}
+              />
+            </Link>
+          </MagneticButton>
         </div>
 
         {/* Products Grid */}
@@ -98,46 +156,8 @@ export function LatestArrivals() {
           ref={productsRef}
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"
         >
-          {latestProducts.map((product) => (
-            <Link
-              key={product.id}
-              to={`/products/${product.id}`}
-              className="group"
-            >
-              {/* Image */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
-                <img
-                  src={optimizeImg(product.image, 400)}
-                  alt={product.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                {/* Hover Image */}
-                {product.hoverImage && (
-                  <img
-                    src={optimizeImg(product.hoverImage, 400)}
-                    alt={`${product.name} - alternate view`}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                )}
-                {/* Badge */}
-                {product.featured && (
-                  <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
-                    New
-                  </span>
-                )}
-              </div>
-
-              {/* Info */}
-              <div>
-                <span className="micro-label text-text-secondary/70">{product.category}</span>
-                <h3 className="font-display text-base text-charcoal group-hover:text-gold transition-colors mt-0.5">
-                  {product.name}
-                </h3>
-                <p className="body-text text-charcoal/80 mt-0.5">{product.price}</p>
-              </div>
-            </Link>
+          {latestProducts.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
           ))}
         </div>
       </div>

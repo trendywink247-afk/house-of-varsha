@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -6,10 +6,39 @@ import { ArrowRight, Filter, X, Search, ArrowUpDown } from 'lucide-react';
 import { categories } from '@/data/products';
 import { useProducts } from '@/hooks/useProducts';
 import { useStock } from '@/hooks/useStock';
+import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
 import { Footer } from '@/sections/Footer';
 import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ------------------------------------------------------------------ */
+/*  Skeleton Shimmer Card                                              */
+/* ------------------------------------------------------------------ */
+
+function SkeletonCard() {
+  return (
+    <div className="animate-shimmer">
+      <div className="aspect-[3/4] bg-beige mb-3 relative overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(201,177,138,0.08) 50%, transparent 100%)',
+            animation: 'shimmer 1.5s infinite',
+          }}
+        />
+      </div>
+      <div className="h-3 bg-beige rounded w-16 mb-2" />
+      <div className="h-4 bg-beige rounded w-3/4 mb-1.5" />
+      <div className="h-3 bg-beige rounded w-20" />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shop Page                                                          */
+/* ------------------------------------------------------------------ */
 
 export function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,11 +49,15 @@ export function Shop() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'low' | 'high'>('default');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const animContextRef = useRef<gsap.Context | null>(null);
+  const prevCategoryRef = useRef<string>(selectedCategory);
 
   const { products, isLoading } = useProducts();
   const { isAllSoldOut } = useStock();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const filteredProducts = useMemo(() => {
     let filtered = selectedCategory === 'all'
@@ -51,11 +84,10 @@ export function Shop() {
     return filtered;
   }, [products, selectedCategory, searchQuery, sortBy]);
 
+  /* ---- Header entrance animation (runs once) ---- */
   useEffect(() => {
     const header = headerRef.current;
-    const grid = gridRef.current;
-
-    if (!header || !grid) return;
+    if (!header || prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -74,16 +106,42 @@ export function Shop() {
           },
         }
       );
+    });
 
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
+
+  /* ---- Grid entrance animation with filter transitions ---- */
+
+  const animateGridEntrance = useCallback(() => {
+    const grid = gridRef.current;
+    if (!grid || prefersReducedMotion) return;
+
+    // Clean up previous animation context
+    if (animContextRef.current) {
+      animContextRef.current.revert();
+    }
+
+    const cards = Array.from(grid.children);
+    if (cards.length === 0) return;
+
+    const ctx = gsap.context(() => {
       gsap.fromTo(
-        grid.children,
-        { y: 30, opacity: 0 },
+        cards,
         {
+          clipPath: 'inset(100% 0 0 0)',
+          y: 30,
+          opacity: 0,
+          rotate: -1,
+        },
+        {
+          clipPath: 'inset(0% 0 0 0)',
           y: 0,
           opacity: 1,
-          stagger: 0.05,
-          duration: 0.6,
-          ease: 'power2.out',
+          rotate: 0,
+          stagger: 0.06,
+          duration: 0.7,
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: grid,
             start: 'top 80%',
@@ -93,8 +151,47 @@ export function Shop() {
       );
     });
 
-    return () => ctx.revert();
-  }, [filteredProducts]);
+    animContextRef.current = ctx;
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const categoryChanged = prevCategoryRef.current !== selectedCategory;
+    prevCategoryRef.current = selectedCategory;
+
+    if (prefersReducedMotion) {
+      gsap.set(grid.children, { opacity: 1, clipPath: 'inset(0)', y: 0, rotate: 0 });
+      return;
+    }
+
+    if (categoryChanged && grid.children.length > 0) {
+      // Animate out existing cards first, then animate in new ones
+      const existingCards = Array.from(grid.children);
+      gsap.to(existingCards, {
+        opacity: 0,
+        y: 15,
+        stagger: 0.03,
+        duration: 0.25,
+        ease: 'power2.in',
+        onComplete: () => {
+          // After fade out, reset and animate entrance
+          gsap.set(existingCards, { opacity: 0, y: 0 });
+          animateGridEntrance();
+        },
+      });
+    } else {
+      animateGridEntrance();
+    }
+
+    return () => {
+      if (animContextRef.current) {
+        animContextRef.current.revert();
+        animContextRef.current = null;
+      }
+    };
+  }, [filteredProducts, selectedCategory, animateGridEntrance, prefersReducedMotion]);
 
   const handleCategoryChange = (slug: string) => {
     if (slug === 'all') {
@@ -107,6 +204,14 @@ export function Shop() {
 
   return (
     <div className="min-h-screen bg-cream pt-24 lg:pt-32 pb-16">
+      {/* Shimmer keyframe (injected once) */}
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
+
       <div className="w-full px-6 lg:px-12">
         {/* Header */}
         <div ref={headerRef} className="mb-10">
@@ -122,15 +227,21 @@ export function Shop() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search with focus animation */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40" strokeWidth={1.5} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
             placeholder="Search products..."
-            className="w-full lg:w-80 pl-10 pr-4 py-2.5 bg-white border border-charcoal/15 text-charcoal placeholder:text-charcoal/40 body-text text-sm focus:outline-none focus:border-gold transition-colors"
+            className="pl-10 pr-4 py-2.5 bg-white text-charcoal placeholder:text-charcoal/40 body-text text-sm focus:outline-none transition-all duration-500 border"
+            style={{
+              borderColor: isSearchFocused ? '#C9B18A' : 'rgba(44, 44, 44, 0.15)',
+              width: isSearchFocused ? 'min(100%, 24rem)' : 'min(100%, 20rem)',
+            }}
           />
           {searchQuery && (
             <button
@@ -223,69 +334,80 @@ export function Shop() {
           </div>
         )}
 
-        {/* Products Grid */}
-        <div
-          ref={gridRef}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"
-        >
-          {filteredProducts.map((product) => (
-            <Link
-              key={product.id}
-              to={`/products/${product.id}`}
-              className="group"
-            >
-              {/* Image */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
-                <img
-                  src={optimizeImg(product.image, 400)}
-                  alt={product.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                {/* Hover Image */}
-                {product.hoverImage && (
-                  <img
-                    src={optimizeImg(product.hoverImage, 400)}
-                    alt={`${product.name} - alternate view`}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                )}
-                {/* Badge */}
-                {product.featured && !isAllSoldOut(product) && (
-                  <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
-                    New
-                  </span>
-                )}
-                {/* Sold Out Badge */}
-                {isAllSoldOut(product) && (
-                  <div className="absolute inset-0 bg-charcoal/40 flex items-center justify-center">
-                    <span className="micro-label bg-cream text-charcoal px-3 py-1">
-                      Sold Out
-                    </span>
-                  </div>
-                )}
-                {/* Quick View Overlay */}
-                {!isAllSoldOut(product) && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="px-3 py-1.5 bg-white/90 text-charcoal micro-label">
-                      Quick View
-                    </span>
-                  </div>
-                )}
-              </div>
+        {/* Loading Skeleton */}
+        {isLoading && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        )}
 
-              {/* Info */}
-              <div>
-                <span className="micro-label text-text-secondary/70">{product.category}</span>
-                <h3 className="font-display text-base text-charcoal group-hover:text-gold transition-colors mt-0.5 line-clamp-1">
-                  {product.name}
-                </h3>
-                <p className="body-text text-charcoal/80 mt-0.5">{product.price}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* Products Grid */}
+        {!isLoading && (
+          <div
+            ref={gridRef}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"
+          >
+            {filteredProducts.map((product) => (
+              <Link
+                key={product.id}
+                to={`/products/${product.id}`}
+                className="group"
+              >
+                {/* Image */}
+                <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3 transition-shadow duration-300 group-hover:shadow-lg">
+                  <img
+                    src={optimizeImg(product.image, 400)}
+                    alt={product.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  {/* Hover Image */}
+                  {product.hoverImage && (
+                    <img
+                      src={optimizeImg(product.hoverImage, 400)}
+                      alt={`${product.name} - alternate view`}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    />
+                  )}
+                  {/* Badge */}
+                  {product.featured && !isAllSoldOut(product) && (
+                    <span className="absolute top-2 left-2 micro-label bg-gold/90 text-white px-2 py-0.5">
+                      New
+                    </span>
+                  )}
+                  {/* Sold Out Badge */}
+                  {isAllSoldOut(product) && (
+                    <div className="absolute inset-0 bg-charcoal/40 flex items-center justify-center">
+                      <span className="micro-label bg-cream text-charcoal px-3 py-1">
+                        Sold Out
+                      </span>
+                    </div>
+                  )}
+                  {/* Quick View Overlay — slides up from bottom */}
+                  {!isAllSoldOut(product) && (
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out pb-4 pt-8 bg-gradient-to-t from-charcoal/30 to-transparent">
+                      <span className="px-3 py-1.5 bg-white/90 text-charcoal micro-label">
+                        Quick View
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div>
+                  <span className="micro-label text-text-secondary/70">{product.category}</span>
+                  <h3 className="font-display text-base text-charcoal group-hover:text-gold transition-colors mt-0.5 line-clamp-1">
+                    {product.name}
+                  </h3>
+                  <p className="body-text text-charcoal/80 mt-0.5">{product.price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
         {filteredProducts.length === 0 && !isLoading && (
