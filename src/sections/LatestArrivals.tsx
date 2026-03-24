@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -106,7 +107,7 @@ export function LatestArrivals() {
               {/* Image */}
               <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
                 <img
-                  src={product.image}
+                  src={optimizeImg(product.image, 400)}
                   alt={product.name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -114,7 +115,7 @@ export function LatestArrivals() {
                 {/* Hover Image */}
                 {product.hoverImage && (
                   <img
-                    src={product.hoverImage}
+                    src={optimizeImg(product.hoverImage, 400)}
                     alt={`${product.name} - alternate view`}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"

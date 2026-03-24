@@ -160,6 +160,40 @@ app.post('/api/checkout/verify', (req, res) => {
   }
 });
 
+// ─── Rate limiting (in-memory, per IP) ──────────────────────
+
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 10; // max checkout requests per minute
+
+function rateLimit(req, res, next) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { start: now, count: 1 });
+    return next();
+  }
+
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+  next();
+}
+
+// Clean up rate limit map every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now - entry.start > RATE_LIMIT_WINDOW) rateLimitMap.delete(ip);
+  }
+}, 5 * 60 * 1000);
+
+// Apply rate limiting to checkout endpoints
+app.use('/api/checkout', rateLimit);
+
 // ─── Security headers ───────────────────────────────────────
 
 app.use((req, res, next) => {
@@ -167,6 +201,16 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://res.cloudinary.com",
+    "connect-src 'self' https://api.razorpay.com https://lumberjack-cx.razorpay.com",
+    "frame-src https://api.razorpay.com https://checkout.razorpay.com",
+  ].join('; '));
   next();
 });
 
@@ -284,6 +328,15 @@ app.get('/api/products', async (req, res) => {
       return res.json({ products, source: 'sheets-api', cached: false });
     }
 
+    // Fallback: serve static product data from products.json if available
+    const productsFile = path.join(__dirname, 'products.json');
+    if (fs.existsSync(productsFile)) {
+      try {
+        const staticProducts = JSON.parse(fs.readFileSync(productsFile, 'utf8'));
+        return res.json({ products: staticProducts, source: 'static', cached: false });
+      } catch { /* fall through */ }
+    }
+
     res.status(404).json({ error: 'No products found or Sheets not configured' });
   } catch (err) {
     console.error('[Sheets API Error]', err.message);
@@ -297,19 +350,19 @@ app.post('/api/products/revalidate', (req, res) => {
   res.json({ ok: true, message: 'Product cache cleared' });
 });
 
-// ─── Serve static files from dist folder ────────────────────
+// ─── Serve static files ─────────────────────────────────────
 
-app.use(express.static(path.join(__dirname, 'dist'), {
+// Check if we're running from source (dist/ exists) or deployed (files at root)
+const staticDir = fs.existsSync(path.join(__dirname, 'dist', 'index.html'))
+  ? path.join(__dirname, 'dist')
+  : __dirname;
+
+app.use(express.static(staticDir, {
   maxAge: '1y',
   immutable: true,
-  index: false, // Don't serve index.html for directory requests via static
-}));
-
-// Serve index.html without cache headers
-app.use(express.static(path.join(__dirname, 'dist'), {
-  maxAge: 0,
+  index: false,
   setHeaders: (res, filePath) => {
-    if (filePath.endsWith('index.html')) {
+    if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-cache');
     }
   },
@@ -328,7 +381,7 @@ app.get('/health', (req, res) => {
 // ─── Handle client-side routing (SPA fallback) ──────────────
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(staticDir, 'index.html'));
 });
 
 // ─── Error handling ─────────────────────────────────────────

@@ -2,11 +2,12 @@ import { useMemo, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Filter, X } from 'lucide-react';
+import { ArrowRight, Filter, X, Search } from 'lucide-react';
 import { categories } from '@/data/products';
 import { useProducts } from '@/hooks/useProducts';
 import { useStock } from '@/hooks/useStock';
 import { Footer } from '@/sections/Footer';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,18 +18,30 @@ export function Shop() {
     [searchParams]
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const gridRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
   const { products, isLoading } = useProducts();
   const { isAllSoldOut } = useStock();
 
-  const filteredProducts =
-    selectedCategory === 'all'
+  const filteredProducts = useMemo(() => {
+    let filtered = selectedCategory === 'all'
       ? products
       : products.filter(
           (p) => p.category.toLowerCase().replace(' ', '-') === selectedCategory
         );
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.color.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q)
+      );
+    }
+    return filtered;
+  }, [products, selectedCategory, searchQuery]);
 
   useEffect(() => {
     const header = headerRef.current;
@@ -99,6 +112,26 @@ export function Shop() {
               Discover our curated selection of handcrafted Indian ethnic wear.
             </p>
           </div>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40" strokeWidth={1.5} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products..."
+            className="w-full lg:w-80 pl-10 pr-4 py-2.5 bg-white border border-charcoal/15 text-charcoal placeholder:text-charcoal/40 body-text text-sm focus:outline-none focus:border-gold transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal/40 hover:text-charcoal"
+            >
+              <X className="w-3.5 h-3.5" strokeWidth={1.5} />
+            </button>
+          )}
         </div>
 
         {/* Filters */}
@@ -181,7 +214,7 @@ export function Shop() {
               {/* Image */}
               <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
                 <img
-                  src={product.image}
+                  src={optimizeImg(product.image, 400)}
                   alt={product.name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -189,7 +222,7 @@ export function Shop() {
                 {/* Hover Image */}
                 {product.hoverImage && (
                   <img
-                    src={product.hoverImage}
+                    src={optimizeImg(product.hoverImage, 400)}
                     alt={`${product.name} - alternate view`}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"

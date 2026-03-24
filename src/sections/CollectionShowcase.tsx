@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -72,7 +73,7 @@ export function CollectionShowcase() {
           {/* Image */}
           <div className="order-1 lg:order-2 aspect-[4/5] overflow-hidden">
             <img
-              src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545996/website/editorial-4.jpg"
+              src={optimizeImg("https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545996/website/editorial-4.jpg", 800)}
               alt="The Collection"
               className="w-full h-full object-cover"
             />

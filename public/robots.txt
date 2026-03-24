@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.builds/
+Disallow: /.env
+
+Sitemap: https://houseofvarsha.in/sitemap.xml

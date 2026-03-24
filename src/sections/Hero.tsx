@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,9 +44,10 @@ export function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545994/website/editorial-1.jpg"
+          src={optimizeImg("https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545994/website/editorial-1.jpg", 1600)}
           alt="House of Varsha"
           className="w-full h-full object-cover opacity-40"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-cream/60 via-cream/40 to-cream" />
       </div>

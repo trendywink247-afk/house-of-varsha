@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,7 +67,7 @@ export function Philosophy() {
           {/* Image */}
           <div ref={imageRef} className="aspect-[4/5] overflow-hidden">
             <img
-              src="https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545999/website/lifestyle-wide-1.jpg"
+              src={optimizeImg("https://res.cloudinary.com/dv6de0ucq/image/upload/v1770545999/website/lifestyle-wide-1.jpg", 1200)}
               alt="Our Philosophy"
               className="w-full h-full object-cover"
             />

@@ -6,7 +6,9 @@ import { ArrowLeft, ArrowRight, Check, ShoppingBag, Heart, ChevronRight } from '
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/hooks/useCart';
 import { useStock } from '@/hooks/useStock';
+import { useWishlist } from '@/hooks/useWishlist';
 import { Footer } from '@/sections/Footer';
+import { optimizeImg } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +18,7 @@ export function ProductDetail() {
   const product = products.find(p => p.id === id);
   const { addToCart } = useCart();
   const { isSoldOut, isAllSoldOut } = useStock();
+  const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
@@ -136,7 +139,7 @@ export function ProductDetail() {
             {/* Main Image */}
             <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-3">
               <img
-                src={product.images[selectedImage]}
+                src={optimizeImg(product.images[selectedImage], 800)}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
@@ -183,7 +186,7 @@ export function ProductDetail() {
                     }`}
                   >
                     <img
-                      src={image}
+                      src={optimizeImg(image, 80)}
                       alt={`${product.name} - view ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -268,10 +271,15 @@ export function ProductDetail() {
                 )}
               </button>
               <button
-                className="w-12 h-12 flex items-center justify-center border border-charcoal/15 text-charcoal hover:border-gold hover:text-gold transition-colors"
-                aria-label="Add to wishlist"
+                onClick={() => product && toggleWishlist(product.id)}
+                className={`w-12 h-12 flex items-center justify-center border transition-colors ${
+                  product && isWishlisted(product.id)
+                    ? 'border-gold text-gold bg-gold/10'
+                    : 'border-charcoal/15 text-charcoal hover:border-gold hover:text-gold'
+                }`}
+                aria-label={product && isWishlisted(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
               >
-                <Heart className="w-4 h-4" strokeWidth={1.5} />
+                <Heart className="w-4 h-4" strokeWidth={1.5} fill={product && isWishlisted(product.id) ? 'currentColor' : 'none'} />
               </button>
             </div>
 
@@ -329,14 +337,14 @@ export function ProductDetail() {
                 >
                   <div className="relative aspect-[3/4] overflow-hidden bg-beige mb-2">
                     <img
-                      src={relatedProduct.image}
+                      src={optimizeImg(relatedProduct.image, 400)}
                       alt={relatedProduct.name}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     {relatedProduct.hoverImage && (
                       <img
-                        src={relatedProduct.hoverImage}
+                        src={optimizeImg(relatedProduct.hoverImage, 400)}
                         alt={`${relatedProduct.name} - alternate view`}
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
