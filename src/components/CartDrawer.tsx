@@ -46,7 +46,6 @@ export function CartDrawer() {
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
     } else {
       setStep('cart');
       setAddressForm(emptyAddress);
@@ -55,9 +54,32 @@ export function CartDrawer() {
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
     };
   }, [isOpen, closeCart]);
+
+  useEffect(() => {
+    if (isOpen) {
+      // iOS-compatible scroll lock
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      if (isOpen) {
+        const scrollY = document.body.style.top;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    };
+  }, [isOpen]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === drawerRef.current) {
@@ -141,43 +163,70 @@ export function CartDrawer() {
         },
         handler: async (response: RazorpayPaymentResponse) => {
           // 4. Verify payment on server
-          const verifyRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/checkout/verify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              items,
-              address: addressForm,
-            }),
-          });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-          const verifyData = await verifyRes.json();
+          try {
+            const verifyRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/checkout/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                items,
+                address: addressForm,
+              }),
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
 
-          if (verifyData.success) {
-            // 5. Success: clear cart, notify store owner via WhatsApp
-            clearCart();
-            setPaymentStatus('success');
-            setStep('cart');
-            setStatusMessage('Payment successful! Thank you for your order.');
-            // Open WhatsApp with order summary + address for store owner
-            const waUrl = buildWhatsAppUrl(response.razorpay_payment_id, addressForm);
-            window.open(waUrl, '_blank');
-          } else {
-            setPaymentStatus('error');
-            setStatusMessage('Payment verification failed. Please contact us on WhatsApp.');
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              // 5. Success: clear cart, notify store owner via WhatsApp
+              clearCart();
+              setPaymentStatus('success');
+              setStep('cart');
+              setStatusMessage('Payment successful! Thank you for your order.');
+              // Open WhatsApp with order summary + address for store owner
+              const waUrl = buildWhatsAppUrl(response.razorpay_payment_id, addressForm);
+              window.open(waUrl, '_blank');
+            } else {
+              setPaymentStatus('error');
+              setStatusMessage('Payment verification failed. Please contact us on WhatsApp.');
+            }
+            setIsProcessing(false);
+          } catch (fetchErr) {
+            clearTimeout(timeoutId);
+            if (fetchErr instanceof Error && fetchErr.name === 'AbortError') {
+              setPaymentStatus('error');
+              setStatusMessage('Payment verification timed out. Your payment may have been processed — please contact us on WhatsApp.');
+            } else {
+              setPaymentStatus('error');
+              setStatusMessage('Payment verification failed. Please contact us on WhatsApp.');
+            }
+            setIsProcessing(false);
           }
-          setIsProcessing(false);
         },
         theme: { color: '#2C2C2C' },
         modal: {
           ondismiss: () => {
             setIsProcessing(false);
+            setPaymentStatus('idle');
+            setStatusMessage('');
           },
         },
       };
 
+      // @ts-expect-error Razorpay is loaded via external script
+      if (!window.Razorpay) {
+        setPaymentStatus('error');
+        setStatusMessage('Payment gateway failed to initialize. Please refresh and try again.');
+        setIsProcessing(false);
+        return;
+      }
+      // @ts-expect-error Razorpay is loaded via external script
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch {
@@ -241,19 +290,20 @@ export function CartDrawer() {
                 </p>
                 {(
                   [
-                    { key: 'name', label: 'Full Name', type: 'text', placeholder: 'Priya Sharma' },
-                    { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: '9876543210' },
-                    { key: 'address', label: 'Address Line 1', type: 'text', placeholder: 'Flat / Building / Street' },
-                    { key: 'city', label: 'City', type: 'text', placeholder: 'Mumbai' },
-                    { key: 'state', label: 'State', type: 'text', placeholder: 'Maharashtra' },
-                    { key: 'pincode', label: 'Pincode', type: 'text', placeholder: '400001' },
-                  ] as { key: keyof AddressForm; label: string; type: string; placeholder: string }[]
-                ).map(({ key, label, type, placeholder }) => (
+                    { key: 'name', label: 'Full Name', type: 'text', placeholder: 'Priya Sharma', maxLength: 100 },
+                    { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: '9876543210', maxLength: 10 },
+                    { key: 'address', label: 'Address Line 1', type: 'text', placeholder: 'Flat / Building / Street', maxLength: 300 },
+                    { key: 'city', label: 'City', type: 'text', placeholder: 'Mumbai', maxLength: 50 },
+                    { key: 'state', label: 'State', type: 'text', placeholder: 'Maharashtra', maxLength: 50 },
+                    { key: 'pincode', label: 'Pincode', type: 'text', placeholder: '400001', maxLength: 6 },
+                  ] as { key: keyof AddressForm; label: string; type: string; placeholder: string; maxLength: number }[]
+                ).map(({ key, label, type, placeholder, maxLength }) => (
                   <div key={key}>
                     <label className="micro-label text-charcoal/70 block mb-1">{label}</label>
                     <input
                       type={type}
                       placeholder={placeholder}
+                      maxLength={maxLength}
                       value={addressForm[key]}
                       onChange={(e) => {
                         setAddressForm((prev) => ({ ...prev, [key]: e.target.value }));

@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import { useStock } from '@/hooks/useStock';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useIsDesktop, useHasFinePointer, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Footer } from '@/sections/Footer';
 import { optimizeImg } from '@/lib/utils';
 
@@ -65,6 +66,11 @@ export function ProductDetail() {
   const isDesktop = useIsDesktop();
   const hasFinePointer = useHasFinePointer();
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  usePageMeta({
+    title: product ? product.name : 'Product',
+    description: product ? product.description : undefined
+  });
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);

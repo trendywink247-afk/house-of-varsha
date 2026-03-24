@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Mail, Phone, MapPin, MessageCircle, Send } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function Contact() {
+  usePageMeta({ title: 'Contact', description: 'Get in touch with House of Varsha. Email, WhatsApp, or visit us in Hyderabad.' });
+
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   

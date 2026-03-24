@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Footer } from '@/sections/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function About() {
+  usePageMeta({ title: 'About Us', description: 'House of Varsha \u2014 celebrating the art of Indian craftsmanship. Handcrafted ethnic wear from Hyderabad.' });
+
   const sectionRef = useRef<HTMLElement>(null);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
 

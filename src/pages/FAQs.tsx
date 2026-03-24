@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Footer } from '@/sections/Footer';
 
 const faqs = [
@@ -38,6 +39,8 @@ const faqs = [
 ];
 
 export function FAQs() {
+  usePageMeta({ title: 'FAQs', description: 'Frequently asked questions about House of Varsha orders, shipping, returns, and more.' });
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (

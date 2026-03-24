@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export function NotFound() {
+  usePageMeta({ title: 'Page Not Found' });
+
   return (
     <div className="min-h-screen bg-cream flex items-center justify-center px-6">
       <div className="text-center max-w-md">

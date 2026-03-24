@@ -23,19 +23,28 @@ import nodemailer from 'nodemailer';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '16kb' }));
 
 // ─── MySQL connection pool ──────────────────────────────────
 
 const dbConfig = {
   host: process.env.DB_HOST || '127.0.0.1',
   port: parseInt(process.env.DB_PORT || '3306'),
-  user: process.env.DB_USER || 'u524306250_ruflo',
-  password: process.env.DB_PASS || '7995767472@Geekspace',
-  database: process.env.DB_NAME || 'u524306250_ruflo',
+  user: process.env.DB_USER || '',
+  password: process.env.DB_PASS || '',
+  database: process.env.DB_NAME || '',
 };
 
 let pool;
@@ -74,9 +83,12 @@ const smtpTransport = process.env.SMTP_HOST ? nodemailer.createTransport({
 const ALLOWED_ORIGINS = [
   'https://www.houseofvarsha.in',
   'https://houseofvarsha.in',
-  'http://localhost:5173',
-  'http://localhost:3000',
 ];
+
+// Add dev origins only in development
+if (process.env.NODE_ENV !== 'production') {
+  ALLOWED_ORIGINS.push('http://localhost:5173', 'http://localhost:3000');
+}
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -307,6 +319,15 @@ app.post('/api/checkout/create-order', async (req, res) => {
       return res.status(503).json({ error: 'Payment gateway not configured' });
     }
 
+    // Validate item structure before checking stock
+    for (const item of items) {
+      const productId = item.product?.id || item.productId;
+      const size = item.size;
+      if (!productId || typeof productId !== 'string' || !size || typeof size !== 'string') {
+        return res.status(400).json({ error: 'Invalid item in cart' });
+      }
+    }
+
     // Check for sold-out items before creating order
     const keys = items.map((item) => `${item.product?.id || item.productId}-${item.size}`);
     let stock;
@@ -395,7 +416,9 @@ app.post('/api/checkout/verify', async (req, res) => {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
-    if (expectedSignature !== razorpay_signature) {
+    const sigBuffer = Buffer.from(razorpay_signature || '', 'utf8');
+    const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+    if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
       console.warn('[Checkout verify] Signature mismatch');
       return res.status(400).json({ success: false, error: 'Payment verification failed' });
     }
@@ -410,33 +433,63 @@ app.post('/api/checkout/verify', async (req, res) => {
       }
     }
 
-    // Mark purchased sizes as sold
-    if (items && Array.isArray(items)) {
-      if (pool && dbConnected) {
+    // Atomically check and mark items as sold (prevents race condition)
+    const soldOutItems = [];
+    if (items && Array.isArray(items) && pool && dbConnected) {
+      let connection;
+      try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
         for (const item of items) {
           const key = `${item.product?.id || item.productId}-${item.size}`;
-          try {
-            await markSold(key);
-          } catch (err) {
-            console.error(`[Stock] Failed to mark ${key} as sold:`, err.message);
+
+          // Lock the row (or gap) to prevent concurrent sells
+          const [existing] = await connection.execute(
+            'SELECT product_size_key, sold_out FROM hov_stock WHERE product_size_key = ? FOR UPDATE',
+            [key],
+          );
+
+          if (existing.length > 0 && existing[0].sold_out) {
+            // Already sold by another customer during payment
+            soldOutItems.push(key);
+          } else {
+            await connection.execute(
+              'INSERT INTO hov_stock (product_size_key, sold_out) VALUES (?, 1) ON DUPLICATE KEY UPDATE sold_out = 1, sold_at = NOW()',
+              [key],
+            );
           }
         }
-      } else {
-        // File fallback
-        try {
-          let stock = {};
-          if (fs.existsSync(STOCK_FILE)) {
-            stock = JSON.parse(fs.readFileSync(STOCK_FILE, 'utf8'));
-          }
-          for (const item of items) {
-            const key = `${item.product?.id || item.productId}-${item.size}`;
-            stock[key] = true;
-          }
-          fs.writeFileSync(STOCK_FILE, JSON.stringify(stock, null, 2));
-        } catch (err) {
-          console.error('[Stock] File write fallback failed:', err.message);
-        }
+
+        await connection.commit();
+      } catch (err) {
+        if (connection) await connection.rollback().catch(() => {});
+        console.error('[Stock] Transaction failed:', err.message);
+        // Fall through — payment was already verified, don't fail the order
+      } finally {
+        if (connection) connection.release();
       }
+    } else if (items && Array.isArray(items)) {
+      // File fallback (no MySQL)
+      try {
+        const STOCK_FILE_PATH = path.join(__dirname, 'stock.json');
+        let stock = {};
+        if (fs.existsSync(STOCK_FILE_PATH)) {
+          stock = JSON.parse(fs.readFileSync(STOCK_FILE_PATH, 'utf8'));
+        }
+        for (const item of items) {
+          const key = `${item.product?.id || item.productId}-${item.size}`;
+          stock[key] = true;
+        }
+        fs.writeFileSync(STOCK_FILE_PATH, JSON.stringify(stock, null, 2));
+      } catch (err) {
+        console.error('[Stock] File fallback failed:', err.message);
+      }
+    }
+
+    // Warn if some items were already sold (race condition detected)
+    if (soldOutItems.length > 0) {
+      console.warn(`[Stock] Race condition detected — items already sold: ${soldOutItems.join(', ')}`);
     }
 
     // ─── Save order to MySQL (GUARANTEED RECORD) ───────────
@@ -505,15 +558,15 @@ app.post('/api/checkout/verify', async (req, res) => {
           ].filter(Boolean).join('\n'),
           html: [
             `<h2>New Order Received</h2>`,
-            `<p><strong>Payment ID:</strong> ${razorpay_payment_id}</p>`,
-            `<p><strong>Order ID:</strong> ${razorpay_order_id}</p>`,
+            `<p><strong>Payment ID:</strong> ${escapeHtml(razorpay_payment_id)}</p>`,
+            `<p><strong>Order ID:</strong> ${escapeHtml(razorpay_order_id)}</p>`,
             `<p><strong>Amount:</strong> ₹${orderTotal.toLocaleString()}</p>`,
             `<hr>`,
             `<h3>Items</h3>`,
-            `<ul>${(items || []).map(i => `<li>${i.product?.name || 'Item'} — Size: ${i.size} — ${i.product?.price || '?'}</li>`).join('')}</ul>`,
+            `<ul>${(items || []).map(i => `<li>${escapeHtml(i.product?.name || 'Item')} — Size: ${escapeHtml(i.size)} — ${escapeHtml(i.product?.price || '?')}</li>`).join('')}</ul>`,
             `<hr>`,
             `<h3>Delivery Address</h3>`,
-            `<p>${customerName}<br>${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}<br>Phone: ${customerPhone}</p>`,
+            `<p>${escapeHtml(customerName)}<br>${escapeHtml(addr.address || '')}, ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} - ${escapeHtml(addr.pincode || '')}<br>Phone: ${escapeHtml(customerPhone)}</p>`,
           ].join('\n'),
         });
         console.log(`[Order] Email notification sent for ${razorpay_order_id}`);
@@ -530,7 +583,7 @@ app.post('/api/checkout/verify', async (req, res) => {
 });
 
 // GET /api/orders — view all orders (protected)
-const ORDERS_SECRET = process.env.ORDERS_SECRET || 'hov-orders-2026';
+const ORDERS_SECRET = process.env.ORDERS_SECRET || crypto.randomBytes(32).toString('hex');
 
 app.get('/api/orders', async (req, res) => {
   if (req.headers['x-orders-secret'] !== ORDERS_SECRET) {
@@ -612,11 +665,11 @@ app.post('/api/contact', async (req, res) => {
           ].filter(Boolean).join('\n'),
           html: [
             `<h3>New Contact Form Message</h3>`,
-            `<p><strong>Name:</strong> ${sanitizedName}</p>`,
-            `<p><strong>Email:</strong> ${sanitizedEmail}</p>`,
-            sanitizedSubject ? `<p><strong>Subject:</strong> ${sanitizedSubject}</p>` : '',
+            `<p><strong>Name:</strong> ${escapeHtml(sanitizedName)}</p>`,
+            `<p><strong>Email:</strong> ${escapeHtml(sanitizedEmail)}</p>`,
+            sanitizedSubject ? `<p><strong>Subject:</strong> ${escapeHtml(sanitizedSubject)}</p>` : '',
             `<hr>`,
-            `<p>${sanitizedMessage.replace(/\n/g, '<br>')}</p>`,
+            `<p>${escapeHtml(sanitizedMessage).replace(/\n/g, '<br>')}</p>`,
           ].filter(Boolean).join('\n'),
         });
       } catch (err) {
@@ -773,7 +826,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 // Revalidation endpoint: POST /api/products/revalidate (protected)
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET || 'hov-revalidate-2026';
+const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET || crypto.randomBytes(32).toString('hex');
 
 app.post('/api/products/revalidate', (req, res) => {
   const secret = req.headers['x-revalidate-secret'];
@@ -842,6 +895,9 @@ app.use((err, req, res, _next) => {
 });
 
 // ─── Start server ───────────────────────────────────────────
+
+if (!process.env.ORDERS_SECRET) console.warn('[Security] ORDERS_SECRET not set — using random per-process secret');
+if (!process.env.REVALIDATE_SECRET) console.warn('[Security] REVALIDATE_SECRET not set — using random per-process secret');
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`House of Varsha server running on port ${PORT}`);

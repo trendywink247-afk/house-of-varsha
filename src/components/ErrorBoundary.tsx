@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { Link } from 'react-router-dom';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -36,9 +35,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               We're sorry, an unexpected error occurred.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/" className="btn-primary">
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false });
+                  window.location.href = '/';
+                }}
+                className="btn-primary"
+              >
                 Back to Home
-              </Link>
+              </button>
               <button
                 type="button"
                 onClick={() => window.location.reload()}

@@ -7,6 +7,7 @@ import { categories } from '@/data/products';
 import { useProducts } from '@/hooks/useProducts';
 import { useStock } from '@/hooks/useStock';
 import { usePrefersReducedMotion } from '@/hooks/useMediaQuery';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Footer } from '@/sections/Footer';
 import { optimizeImg } from '@/lib/utils';
 
@@ -58,6 +59,8 @@ export function Shop() {
   const { products, isLoading } = useProducts();
   const { isAllSoldOut } = useStock();
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  usePageMeta({ title: 'Shop', description: 'Shop handcrafted Kurtis, Kurti Sets & Coordsets. Pure cotton, Kalamkari prints. Starting at \u20B9649.' });
 
   const filteredProducts = useMemo(() => {
     let filtered = selectedCategory === 'all'
