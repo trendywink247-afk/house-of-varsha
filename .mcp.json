@@ -1,25 +1,13 @@
 {
   "mcpServers": {
     "claude-flow": {
-      "command": "npx",
+      "command": "sh",
       "args": [
-        "-y",
-        "@claude-flow/cli@latest",
-        "mcp",
-        "start"
+        "-c",
+        "set -a && . \"$HOME/house-of-varsha-src/.claude-flow/.env\" && set +a && npx -y @claude-flow/cli@latest mcp start"
       ],
       "env": {
-        "npm_config_update_notifier": "false",
-        "CLAUDE_FLOW_MODE": "v3",
-        "CLAUDE_FLOW_HOOKS_ENABLED": "true",
-        "CLAUDE_FLOW_TOPOLOGY": "hierarchical",
-        "CLAUDE_FLOW_MAX_AGENTS": "8",
-        "CLAUDE_FLOW_MEMORY_BACKEND": "mysql",
-        "RUFLO_DB_HOST": "localhost",
-        "RUFLO_DB_PORT": "3306",
-        "RUFLO_DB_USER": "u524306250_ruflo",
-        "RUFLO_DB_NAME": "u524306250_ruflo",
-        "RUFLO_DB_PASS": "7995767472@Geekspace"
+        "npm_config_update_notifier": "false"
       },
       "autoStart": true
     }
