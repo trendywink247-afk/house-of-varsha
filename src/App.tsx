@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Header } from '@/components/Header';
@@ -65,7 +65,7 @@ function HomePage() {
 function App() {
   return (
     <CartProvider>
-      <HashRouter>
+      <BrowserRouter>
         <ScrollToTop />
         <div className="relative min-h-screen bg-cream">
           <a href="#main-content" className="skip-link">
@@ -90,7 +90,7 @@ function App() {
           </Routes>
           </div>
         </div>
-      </HashRouter>
+      </BrowserRouter>
     </CartProvider>
   );
 }
